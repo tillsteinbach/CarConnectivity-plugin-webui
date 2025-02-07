@@ -21,7 +21,8 @@ dependencies = [
     "flask-caching~=2.3.0",
     "WTForms~=3.2.1",
     "flask_wtf~=1.2.1",
-    "pypng~=0.20220715.0"
+    "pypng~=0.20220715.0",
+    "Bootstrap-Flask~=2.4.1"
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
