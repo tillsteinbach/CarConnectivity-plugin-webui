@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Garage{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {% if garage.list_vehicles() %}
+    {% for vehicle in garage.list_vehicles() %}
+      <div class="card" style="width: 300px;">
+        <img src="{{url_for('static', filename='icons/vehicle.webp')}}" class="card-img-top" alt="...">
+        <div class="card-body text-center">
+            <h5 class="card-title">{{vehicle.name.value if vehicle.name.enabled else vehcile.id}}</h5>
+            <p class="card-text">
+              {% if vehicle.license_plate.enabled %}
+                {{vehicle.license_plate.value}}<br/>
+              {% endif %}
+              {% if vehicle.model.enabled %}
+                {{vehicle.model.value}}<br/>
+              {% endif %}
+              {% if vehicle.drives.total_range.enabled %}
+                Range: {{vehicle.drives.total_range}}<br/>
+              {% endif %}
+              {% if vehicle.odometer.enabled %}
+                Odometer: {{vehicle.odometer.value}}<br/>
+              {% endif %}
+            </p>
+            <a href="{{ url_for('garage.vehicle', vin=vehicle.vin.value) }}" class="btn btn-primary">View Vehicle</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No vehicles in the garage yet. You might need to add a connector to see vehicles.</p>
+  {% endif %}
+
+{% endblock %}

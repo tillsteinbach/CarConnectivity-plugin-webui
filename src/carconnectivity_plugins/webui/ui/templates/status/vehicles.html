@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Vehicles{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<table style="width: 100%;">
+  <!-- Table headers not necessary-->
+  {% for vehicle in vehicles %}
+  <tr>
+      <td style="width: 400px"><a href="{{ url_for('status.vehicle', vin=vehicle.vin.value) }}"><img src="{{ url_for('status.vehicleImg', vin=vehicle.vin.value) }}" onerror="this.style.display='none'" class="status"/></a></td>
+      <td>
+        <div><h3><a href="{{ url_for('status.vehicle', vin=vehicle.vin.value) }}">{{vehicle.nickname.value}}</a> (<a href="{{ url_for('status.vehicle', vin=vehicle.vin.value) }}">{{vehicle.model.value}}</a>)</h3>
+          <p>
+            
+            {% if vehicle.statusExists('charging', 'batteryStatus') and vehicle.domains['charging']['batteryStatus'].currentSOC_pct.enabled %} {{vehicle.domains['charging']['batteryStatus'].currentSOC_pct}}% electric SoC,{% endif %}
+            {% if vehicle.statusExists('parking', 'parkingPosition') and vehicle.domains['parking']['parkingPosition'].enabled and not vehicle.domains['parking']['parkingPosition'].hasError() %} parked, {% endif %}
+            {% if vehicle.statusExists('vehicleHealthWarnings', 'warningLights') and vehicle.domains['vehicleHealthWarnings']['warningLights'].enabled and vehicle.domains['vehicleHealthWarnings']['warningLights'].warningLights|length > 0 %}
+              <br/>
+              {% for warningLight in vehicle.domains['vehicleHealthWarnings']['warningLights'].warningLights.values() %}
+              Warning: {{warningLight.text.value}}<br/>
+              {% endfor %}
+            {% endif %}
+
+          </p>
+        </div>
+      </td>
+      <td><a href="{{ url_for('settings.vehicle', vin=vehicle.vin.value) }}"><img src="{{ url_for('static', filename='icons/settings.png') }}" class="icon"/></td></a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

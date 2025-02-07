@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Login {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <div class="form-wrapper">
+    {% from 'bootstrap5/form.html' import render_form %}
+    {{ render_form(form=form, extra_classes='form-signin') }}
+    
+  </div>
+{% endblock %}

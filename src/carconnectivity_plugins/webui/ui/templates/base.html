@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>{% block title %}{% endblock %} - CarConnectivity</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  {% block head %}
+  {% endblock %}
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a href="#" class="navbar-brand">CarConnectivity</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% for item in navbar %}
+          {% if item.divider %}
+          <hr class="dropdown-divider">
+          {% elif not item.sublinks %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{item.url}}">{{item.text}}</a>
+          </li>
+          {% else %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{item.text}}
+            </a>
+            <ul class="dropdown-menu">
+              {% for sublink in item.sublinks %}
+              {% if sublink.divider %}
+              <hr class="dropdown-divider">
+              {% elif not sublink.sublinks %}
+              <li><a class="dropdown-item" href="{{sublink.url}}">{{sublink.text}}</a></li>
+              {% else %}
+              <li class="nav-item dropend">
+                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{sublink.text}}
+                </a>
+                <ul class="dropdown-menu">
+                  {% for subsublink in sublink.sublinks %}
+                  <li><a class="dropdown-item" href="{{subsublink.url}}">{{subsublink.text}}</a></li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+        <div class="navbar-nav ms-auto">
+          {% if current_user.is_authenticated %}
+          <a href="{{ url_for('logout') }}" class="nav-item nav-link">Logout {{ current_user.get_id() }}</a>
+          {% else %}
+          <a href="{{ url_for('login') }}" class="nav-item nav-link">Login</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>{% block header %}{% endblock %}</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{category}} alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}
+        {% endblock %}
+      </div>
+      <hr>
+      <footer>
+        <div class="row">
+          <div class="col-md-6">
+            <p>CarConnectivity</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="{{ url_for('about') }}" class="text-dark">About</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+</body>
+
+</html>

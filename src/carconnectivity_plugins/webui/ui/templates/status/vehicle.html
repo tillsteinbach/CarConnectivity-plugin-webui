@@ -1,0 +1,483 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+<script>
+  $(function () {
+    $("#tabs").tabs();
+  });
+</script>
+{% endblock %}
+
+{% block header %}
+<h1>{% block title %}Vehicle Status for {{vehicle.nickname.value}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div>
+  <div style="display: flex; margin-top: 5px;">
+    <div style="flex: 0 0 250px;">
+      <img src="{{ url_for('status.vehicleStatusOrImgBadge', vin=vehicle.vin.value) }}" onerror="this.style.display='none'" class="status" style="margin-right: 5px"/>
+    </div>
+
+    {% if vehicle.statusExists('parking', 'parkingPosition') and vehicle.domains['parking']['parkingPosition'].enabled and not vehicle.domains['parking']['parkingPosition'].hasError() %}
+    <div style="flex: 1;" id="mapid"></div>
+
+    <script>
+      var parkingPosition = L.latLng({{ vehicle.domains['parking']['parkingPosition'].latitude.value }}, {{ vehicle.domains['parking']['parkingPosition'].longitude.value }});
+      var map = L.map('mapid').setView(parkingPosition, 10);
+      setTimeout(function () { map.flyToBounds([parkingPosition], { animate: true, duration: 1.0 }); }, 300);
+
+
+      const parkingTime = new Date('{{vehicle.domains['parking']['parkingPosition'].carCapturedTimestamp.value.isoformat()}}');
+
+      var vehicleIcon = L.icon({
+        iconUrl: '{{ url_for("status.vehicleImg", vin=vehicle.vin.value, fallback='icons/pin.png')}}',
+        iconSize: [77, 43],
+        iconAnchor: [37, 22],
+        popupAnchor: [0, -10],
+        tooltipAnchor: [37, 0],
+      });
+
+      const osm = new L.TileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 }
+      );
+
+      const hybrid = new L.TileLayer(
+        "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+        { maxZoom: 20, subdomains: ["mt0", "mt1", "mt2", "mt3"] }
+      );
+
+      new L.Control.Layers({ OSM: osm, Hybrid: hybrid }).addTo(map);
+      map.addLayer(osm);
+
+
+      L.marker([{{ vehicle.domains['parking']['parkingPosition'].latitude.value }}, {{ vehicle.domains['parking']['parkingPosition'].longitude.value }}], { icon: vehicleIcon }).addTo(map)
+        .bindTooltip('Parking position from ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString())
+
+    </script>
+    {% endif %}
+  </div>
+  <hr>
+  <div id="tabs">
+    <ul>
+      <li><a href="#tabs-status">Status</a></li>
+      <li><a href="#tabs-capabilities">Capabilities</a></li>
+      <li><a href="#tabs-info">Information</a></li>
+    </ul>
+    <div id="tabs-status">
+      {% if vehicle.statusExists('vehicleHealthWarnings', 'warningLights') and vehicle.domains['vehicleHealthWarnings']['warningLights'].enabled and vehicle.domains['vehicleHealthWarnings']['warningLights'].warningLights|length > 0 %}
+        <p>
+        <h2>Warnings (From {{vehicle.domains['vehicleHealthWarnings']['warningLights'].carCapturedTimestamp.value.isoformat()}})</h2>
+        {% for warningLight in vehicle.domains['vehicleHealthWarnings']['warningLights'].warningLights.values() %}
+        <ul>
+        <li>{{warningLight.text.value}}</li>
+        </ul>
+        {% endfor %}
+        </p>
+      {% endif %}
+      {% if vehicle.statusExists('fuelStatus', 'rangeStatus') and vehicle.domains['fuelStatus']['rangeStatus'].enabled and not vehicle.domains['fuelStatus']['rangeStatus'].hasError() and vehicle.domains['fuelStatus']['rangeStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Range Status (From {{vehicle.domains['fuelStatus']['rangeStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['fuelStatus']['rangeStatus'].carType.enabled %}
+        <li> Car type: {{vehicle.domains['fuelStatus']['rangeStatus'].carType.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['fuelStatus']['rangeStatus'].totalRange_km.enabled %}
+        <li> Total Range: {{vehicle.domains['fuelStatus']['rangeStatus'].totalRange_km.value}}km</li>
+        {% endif %}
+        {% if vehicle.domains['fuelStatus']['rangeStatus'].primaryEngine.enabled %}
+        <li> Primary engine: {{vehicle.domains['fuelStatus']['rangeStatus'].primaryEngine}}</li>
+        {% endif %}
+        {% if vehicle.domains['fuelStatus']['rangeStatus'].secondaryEngine.enabled %}
+        <li> Secondary engine: {{vehicle.domains['fuelStatus']['rangeStatus'].secondaryEngine}}</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('charging', 'batteryStatus') and vehicle.domains['charging']['batteryStatus'].enabled and not vehicle.domains['charging']['batteryStatus'].hasError() and vehicle.domains['charging']['batteryStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Battery Status (From {{vehicle.domains['charging']['batteryStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['charging']['batteryStatus'].currentSOC_pct.enabled %}
+        <li> Current SoC: {{vehicle.domains['charging']['batteryStatus'].currentSOC_pct.value}}%</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['batteryStatus'].cruisingRangeElectric_km.enabled %}
+        <li> Cruising Range Electric: {{vehicle.domains['charging']['batteryStatus'].cruisingRangeElectric_km.value}}km</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('charging', 'chargingStatus') and vehicle.domains['charging']['chargingStatus'].enabled and not vehicle.domains['charging']['chargingStatus'].hasError() and vehicle.domains['charging']['chargingStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Charging Status (From {{vehicle.domains['charging']['chargingStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['charging']['chargingStatus'].remainingChargingTimeToComplete_min.enabled and
+        vehicle.domains['charging']['chargingStatus'].remainingChargingTimeToComplete_min.value > 0 %}
+        <li> Charging time to complete:
+          {{vehicle.domains['charging']['chargingStatus'].remainingChargingTimeToComplete_min.value}}min</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingStatus'].chargingState.enabled %}
+        <li> Charging State: {{vehicle.domains['charging']['chargingStatus'].chargingState.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingStatus'].chargeMode.enabled %}
+        <li> Charge Mode: {{vehicle.domains['charging']['chargingStatus'].chargeMode.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingStatus'].chargePower_kW.enabled and
+        vehicle.domains['charging']['chargingStatus'].chargePower_kW.value > 0 %}
+        <li> Charge Power: {{vehicle.domains['charging']['chargingStatus'].chargePower_kW.value}}kW</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingStatus'].chargeRate_kmph.enabled and
+        vehicle.domains['charging']['chargingStatus'].chargeRate_kmph.value > 0 %}
+        <li> Charge Rate: {{vehicle.domains['charging']['chargingStatus'].chargeRate_kmph.value}}km/h</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('charging', 'chargingSettings') and vehicle.domains['charging']['chargingSettings'].enabled and not vehicle.domains['charging']['chargingSettings'].hasError() and vehicle.domains['charging']['chargingSettings'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Charging Settings (From {{vehicle.domains['charging']['chargingSettings'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['charging']['chargingSettings'].maxChargeCurrentAC.enabled %}
+        <li> Max charge current AC: {{vehicle.domains['charging']['chargingSettings'].maxChargeCurrentAC.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingSettings'].autoUnlockPlugWhenCharged.enabled %}
+        <li> Auto unlock plug when charged:
+          {{vehicle.domains['charging']['chargingSettings'].autoUnlockPlugWhenCharged.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingSettings'].autoUnlockPlugWhenChargedAC.enabled %}
+        <li> Auto unlock plug when charged (AC):
+          {{vehicle.domains['charging']['chargingSettings'].autoUnlockPlugWhenChargedAC.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['chargingSettings'].targetSOC_pct.enabled %}
+        <li> Target SoC: {{vehicle.domains['charging']['chargingSettings'].targetSOC_pct.value}}%</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('charging', 'plugStatus') and vehicle.domains['charging']['plugStatus'].enabled and not vehicle.domains['charging']['plugStatus'].hasError() and vehicle.domains['charging']['plugStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Plug Status (From {{vehicle.domains['charging']['plugStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['charging']['plugStatus'].plugConnectionState.enabled %}
+        <li> Plug Connection State: {{vehicle.domains['charging']['plugStatus'].plugConnectionState.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['plugStatus'].plugLockState.enabled %}
+        <li> Plug Lock State: {{vehicle.domains['charging']['plugStatus'].plugLockState.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['plugStatus'].externalPower.enabled %}
+        <li> External Power: {{vehicle.domains['charging']['plugStatus'].externalPower.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['charging']['plugStatus'].ledColor.enabled %}
+        <li> LED Color: {{vehicle.domains['charging']['plugStatus'].ledColor.value.value}}</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('climatisation', 'climatisationStatus') and vehicle.domains['climatisation']['climatisationStatus'].enabled and not vehicle.domains['climatisation']['climatisationStatus'].hasError() and vehicle.domains['climatisation']['climatisationStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Climatization Status (From {{vehicle.domains['climatisation']['climatisationStatus'].carCapturedTimestamp.value.isoformat()}})
+      </h2>
+      <ul>
+        {% if vehicle.domains['climatisation']['climatisationStatus'].climatisationState.enabled %}
+        <li> Climatization State: {{vehicle.domains['climatisation']['climatisationStatus'].climatisationState.value.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationStatus'].remainingClimatisationTime_min.enabled and
+        vehicle.domains['climatisation']['climatisationStatus'].climatisationState.value.value != 'off'%}
+        <li> Remaining climatization time:
+          {{vehicle.domains['climatisation']['climatisationStatus'].remainingClimatisationTime_min.value}}min</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('climatisation', 'climatisationSettings') and vehicle.domains['climatisation']['climatisationSettings'].enabled and not vehicle.domains['climatisation']['climatisationSettings'].hasError() and vehicle.domains['climatisation']['climatisationSettings'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Climatization Settings (From
+        {{vehicle.domains['climatisation']['climatisationSettings'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['climatisation']['climatisationSettings'].targetTemperature_C.enabled %}
+        <li> Target temperature: {{vehicle.domains['climatisation']['climatisationSettings'].targetTemperature_C.value}}°C</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].climatisationWithoutExternalPower.enabled %}
+        <li> Climatization without external power:
+          {{vehicle.domains['climatisation']['climatisationSettings'].climatisationWithoutExternalPower.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].climatizationAtUnlock.enabled %}
+        <li> Climatization at unlock: {{vehicle.domains['climatisation']['climatisationSettings'].climatizationAtUnlock.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].windowHeatingEnabled.enabled %}
+        <li> Window heating: {{vehicle.domains['climatisation']['climatisationSettings'].windowHeatingEnabled.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].zoneFrontLeftEnabled.enabled %}
+        <li> Zone front left: {{vehicle.domains['climatisation']['climatisationSettings'].zoneFrontLeftEnabled.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].zoneFrontRightEnabled.enabled %}
+        <li> Zone front right: {{vehicle.domains['climatisation']['climatisationSettings'].zoneFrontRightEnabled.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].zoneRearLeftEnabled.enabled %}
+        <li> Zone rear left: {{vehicle.domains['climatisation']['climatisationSettings'].zoneRearLeftEnabled.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['climatisation']['climatisationSettings'].zoneRearRightEnabled.enabled %}
+        <li> Zone rear right: {{vehicle.domains['climatisation']['climatisationSettings'].zoneRearRightEnabled.value}}</li>
+        {% endif %}
+
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('climatisation', 'windowHeatingStatus') and vehicle.domains['climatisation']['windowHeatingStatus'].enabled and not vehicle.domains['climatisation']['windowHeatingStatus'].hasError() and vehicle.domains['climatisation']['windowHeatingStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Window heating Status (From
+        {{vehicle.domains['climatisation']['windowHeatingStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['climatisation']['windowHeatingStatus'].windows.enabled %}
+        {% for windowName, window in vehicle.domains['climatisation']['windowHeatingStatus'].windows.items() %}
+        <li> {{window}}</li>
+        {% endfor %}
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('automation', 'climatisationTimer') and vehicle.domains['automation']['climatisationTimer'].enabled and not vehicle.domains['automation']['climatisationTimer'].hasError() and vehicle.domains['automation']['climatisationTimer'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Climatization Timer (From {{vehicle.domains['automation']['climatisationTimer'].carCapturedTimestamp.value.isoformat()}})
+      </h2>
+      <ul>
+        {% if vehicle.domains['automation']['climatisationTimer'].timeInCar.enabled %}
+        <li> Time in car: {{vehicle.domains['automation']['climatisationTimer'].timeInCar.value.isoformat()}}</li>
+        {% endif %}
+        {% if vehicle.domains['automation']['climatisationTimer'].timers.enabled %}
+        <li>Timers:
+          <ul>
+            {% for timerName, timer in vehicle.domains['automation']['climatisationTimer'].timers.items() %}
+            <li> {{timer}}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('lvBattery', 'lvBatteryStatus') and vehicle.domains['lvBattery']['lvBatteryStatus'].enabled and not vehicle.domains['lvBattery']['lvBatteryStatus'].hasError() %}
+      <p>
+      <h2>12V battery status</h2>
+      <ul>
+        {% if vehicle.domains['lvBattery']['lvBatteryStatus'].batterySupport.enabled %}
+        <li> Battery support: {{vehicle.domains['lvBattery']['lvBatteryStatus'].batterySupport.value.value}}</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('measurements', 'odometerStatus') and vehicle.domains['measurements']['odometerStatus'].enabled and not vehicle.domains['measurements']['odometerStatus'].hasError() and vehicle.domains['measurements']['odometerStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Odometer status (From {{vehicle.domains['measurements']['odometerStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['measurements']['odometerStatus'].odometer.enabled %}
+        <li> Odometer: {{vehicle.domains['measurements']['odometerStatus'].odometer.value}}km</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+      
+      {% if vehicle.statusExists('readiness', 'readinessStatus') and vehicle.domains['readiness']['readinessStatus'].enabled and not vehicle.domains['readiness']['readinessStatus'].hasError() %}
+      <p>
+      <h2>Readiness status</h2>
+      <ul>
+        {% if vehicle.domains['readiness']['readinessStatus'].connectionState.enabled %}
+        <li> Connection State:
+          <ul>
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionState.isOnline.enabled %}
+            <li> Is Online: {{vehicle.domains['readiness']['readinessStatus'].connectionState.isOnline.value}}</li>
+            {% endif %}
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionState.isActive.enabled %}
+            <li> Is Active: {{vehicle.domains['readiness']['readinessStatus'].connectionState.isActive.value}}</li>
+            {% endif %}
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionState.batteryPowerLevel.enabled %}
+            <li> Battery Power Level: {{vehicle.domains['readiness']['readinessStatus'].connectionState.batteryPowerLevel.value.value}}</li>
+            {% endif %}
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionState.dailyPowerBudgetAvailable.enabled %}
+            <li> Daily Power Budget Available: {{vehicle.domains['readiness']['readinessStatus'].connectionState.dailyPowerBudgetAvailable.value}}</li>
+            {% endif %}
+          </ul>
+        </li>
+        {% endif %}
+        {% if vehicle.domains['readiness']['readinessStatus'].connectionWarning.enabled %}
+        <li> Connection Warning:
+          <ul>
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionWarning.insufficientBatteryLevelWarning.enabled %}
+            <li> Insufficient Battery Level Warning {{vehicle.domains['readiness']['readinessStatus'].connectionWarning.insufficientBatteryLevelWarning.value}}</li>
+            {% endif %}
+            {% if vehicle.domains['readiness']['readinessStatus'].connectionWarning.dailyPowerBudgetWarning.enabled %}
+            <li> Daily Power Budget Warning: {{vehicle.domains['readiness']['readinessStatus'].connectionWarning.dailyPowerBudgetWarning.value}}</li>
+            {% endif %}
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('vehicleHealthInspection', 'maintenanceStatus') and vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].enabled and not vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].hasError() and vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Maintenance Status (From {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].mileage_km.enabled %}
+          <li>Current mileage: {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].mileage_km.value}} km</li>
+        {% endif %}
+        {% if vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].inspectionDue_days.enabled %}
+          <li>Inspection due in: {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].inspectionDue_days.value}} days</li>
+        {% endif %}
+        {% if vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].inspectionDue_km.enabled %}
+          <li>Inspection due in: {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].inspectionDue_km.value}} km</li>
+        {% endif %}
+        {% if vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].oilServiceDue_days.enabled %}
+          <li>Oil service in: {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].oilServiceDue_days.value}} days</li>
+        {% endif %}
+        {% if vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].oilServiceDue_km.enabled %}
+          <li>Oil service in: {{vehicle.domains['vehicleHealthInspection']['maintenanceStatus'].oilServiceDue_km.value}} km</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('access', 'accessStatus') and vehicle.domains['access']['accessStatus'].enabled and not vehicle.domains['access']['accessStatus'].hasError() and vehicle.domains['access']['accessStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Access Status (From {{vehicle.domains['access']['accessStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['access']['accessStatus'].overallStatus.enabled %}
+        <li> Overall Status: {{vehicle.domains['access']['accessStatus'].overallStatus.value.value}}</li>
+        {% endif %}
+        <table>
+          <tr>
+            {% if vehicle.domains['access']['accessStatus'].doors.enabled %}
+            <th>Doors</th>
+            {% endif %}
+            {% if vehicle.domains['access']['accessStatus'].windows.enabled %}
+            <th>Windows</th>
+            {% endif %}
+          </tr>
+          <tr>
+            <td>
+              {% if vehicle.domains['access']['accessStatus'].doors.enabled %}
+              <ul>
+                {% for doorName, door in vehicle.domains['access']['accessStatus'].doors.items() %}
+                <li> {{door}}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              {% if vehicle.domains['access']['accessStatus'].windows.enabled %}
+              <ul>
+                {% for windowName, window in vehicle.domains['access']['accessStatus'].windows.items() %}
+                <li> {{window}}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('vehicleLights', 'lightsStatus') and vehicle.domains['vehicleLights']['lightsStatus'].enabled and not vehicle.domains['vehicleLights']['lightsStatus'].hasError() and vehicle.domains['vehicleLights']['lightsStatus'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Lights Status (From {{vehicle.domains['vehicleLights']['lightsStatus'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+            {% if vehicle.domains['vehicleLights']['lightsStatus'].lights.enabled %}
+              {% for lightName, light in vehicle.domains['vehicleLights']['lightsStatus'].lights.items() %}
+                <li> {{light}}</li>
+              {% endfor %}
+            {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+
+      {% if vehicle.statusExists('parking', 'parkingPosition') and vehicle.domains['parking']['parkingPosition'].enabled and not vehicle.domains['parking']['parkingPosition'].hasError() and vehicle.domains['parking']['parkingPosition'].carCapturedTimestamp.value is not none %}
+      <p>
+      <h2>Parking position (From {{vehicle.domains['parking']['parkingPosition'].carCapturedTimestamp.value.isoformat()}})</h2>
+      <ul>
+        {% if vehicle.domains['parking']['parkingPosition'].error.enabled %}
+        <li> Error: {{vehicle.domains['parking']['parkingPosition'].error}}</li>
+        {% endif %}
+        {% if vehicle.domains['parking']['parkingPosition'].latitude.enabled %}
+        <li> Latitude: {{vehicle.domains['parking']['parkingPosition'].latitude.value}}</li>
+        {% endif %}
+        {% if vehicle.domains['parking']['parkingPosition'].longitude.enabled %}
+        <li> Longitude: {{vehicle.domains['parking']['parkingPosition'].longitude.value}}</li>
+        {% endif %}
+      </ul>
+      </p>
+      {% endif %}
+    </div>
+    {% if vehicle.capabilities.enabled %}
+    <div id="tabs-capabilities">
+      <p>
+      <h2>Vehicle capabilities</h2>
+      <ul>
+        {% for capabilityName, capability in vehicle.capabilities.items() %}
+        <li> {{capability}}</li>
+        {% endfor %}
+      </ul>
+      </p>
+    </div>
+    {% endif %}
+    <div id="tabs-info">
+      <p>
+      <h2>Vehicle Information</h2>
+      <ul>
+        {% if vehicle.vin.enabled %}
+        <li> VIN: {{vehicle.vin.value}}</li>
+        {% endif %}
+        {% if vehicle.role.enabled %}
+        <li> User Role: {{vehicle.role.value.value}}</li>
+        {% endif %}
+        {% if vehicle.enrollmentStatus.enabled %}
+        <li> Enrollment Status: {{vehicle.enrollmentStatus.value.value}}</li>
+        {% endif %}
+        {% if vehicle.userRoleStatus.enabled %}
+        <li> User Status: {{vehicle.userRoleStatus.value.value}}</li>
+        {% endif %}
+        {% if vehicle.model.enabled %}
+        <li> Model: {{vehicle.model.value}}</li>
+        {% endif %}
+        {% if vehicle.devicePlatform.enabled %}
+        <li> Device Platform: {{vehicle.devicePlatform.value.value}}</li>
+        {% endif %}
+        {% if vehicle.nickname.enabled %}
+        <li> Nickname: {{vehicle.nickname.value}}</li>
+        {% endif %}
+        {% if vehicle.brandCode.enabled %}
+        <li> Brand Code: {{vehicle.brandCode.value.value}}</li>
+        {% endif %}
+        {% if vehicle.coUsers.enabled and vehicle.coUsers|length > 0 %}
+        <li> Co Users:
+          <ul>
+            {% for user in vehicle.coUsers %}
+            <li> {{user}}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

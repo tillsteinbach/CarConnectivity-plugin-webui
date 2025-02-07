@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Connectors Status{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% if connectors %}
+<table class="table">
+  <thead>
+      <tr>
+          <th>Connector</th>
+          <th>Connector Status</th>
+          <th>Log Level</th>
+          <th>Version</th>
+          <th>Last Update</th>
+      </tr>
+  </thead>
+  <tbody>
+    {% for connector in connectors %}
+      {% if connector.is_healthy() %}
+      <tr class="table-success">
+      {% else %}
+      <tr class="table-danger">
+      {% endif %}
+          <td>{{connector.id}}</td>
+          <td>{{ "healthy" if connector.is_healthy() else "unhealthy"}}</td>
+          <td>{{connector.log_level}}</td>
+          <td>{{connector.version}}</td>
+          <td><p id="{{connector.id}}-last-update"></p><script type="text/javascript">document.getElementById("{{connector.id}}-last-update").innerHTML = new Date('{{connector.last_update}}').toString();</script></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No connectors found</p>
+{% endif %}
+{% endblock %}

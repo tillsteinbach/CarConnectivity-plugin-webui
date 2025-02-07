@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Plugins Status{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% if plugins %}
+<table class="table">
+  <thead>
+      <tr>
+          <th>Plugin</th>
+          <th>Plugin Status</th>
+          <th>Log Level</th>
+          <th>Version</th>
+      </tr>
+  </thead>
+  <tbody>
+    {% for plugin in plugins %}
+      {% if plugin.is_healthy() %}
+      <tr class="table-success">
+      {% else %}
+      <tr class="table-danger">
+      {% endif %}
+          <td>{{plugin.id}}</td>
+          <td>{{ "healthy" if plugin.is_healthy() else "unhealthy"}}</td>
+          <td>{{plugin.log_level}}</td>
+          <td>{{plugin.version}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No plugins found</p>
+{% endif %}
+{% endblock %}
