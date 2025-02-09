@@ -6,11 +6,12 @@
 
 {% block content %}
   {% if garage.list_vehicles() %}
+    <div class="card-deck">
     {% for vehicle in garage.list_vehicles() %}
-      <div class="card" style="width: 300px;">
+      <div class="card" style="width: 300px; display:inline-block;">
         <img src="{{url_for('static', filename='icons/vehicle.webp')}}" class="card-img-top" alt="...">
         <div class="card-body text-center">
-            <h5 class="card-title">{{vehicle.name.value if vehicle.name.enabled else vehcile.id}}</h5>
+            <h5 class="card-title">{{vehicle.name.value if vehicle.name.enabled else vehicle.id}}</h5>
             <p class="card-text">
               {% if vehicle.license_plate.enabled %}
                 {{vehicle.license_plate.value}}<br/>
@@ -29,6 +30,7 @@
         </div>
       </div>
     {% endfor %}
+    </div>
   {% else %}
     <p>No vehicles in the garage yet. You might need to add a connector to see vehicles.</p>
   {% endif %}
