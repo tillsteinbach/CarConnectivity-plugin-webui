@@ -134,7 +134,9 @@ class WebUI:
                         return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'
                                                         f'Last changed $$${element.last_changed}$$$" class="js-convert-time-title text-decoration-none '
                                                         'text-reset">')
-                    return_str += markupsafe.escape(f'{element.value}{' '+str(element.unit) if element.unit is not None else ""}')
+                    return_str += markupsafe.escape(str(element.value))
+                    if element.unit is not None:
+                        return_str += markupsafe.escape(str(element.unit))
                     if with_tooltip:
                         return_str += markupsafe.Markup('</a>')
                     if linebreak:
