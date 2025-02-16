@@ -51,17 +51,22 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         else:
             port: int = 4000
 
-        if 'username' in self.config:
-            username: Optional[str] = self.config['username']
-        else:
-            username: Optional[str] = None
+        users: Dict[str, str] = {}
+        if 'username' in self.config and self.config['username'] is not None \
+                and 'password' in self.config and self.config['password'] is not None:
+            users[self.config['username']] = self.config['password']
 
-        if 'password' in self.config:
-            password: Optional[str] = self.config['password']
-        else:
-            password: Optional[str] = None
+        if 'users' in self.config and self.config['users'] is not None:
+            for user in self.config['users']:
+                if 'username' in user and 'password' in user:
+                    users[user['username']] = user['password']
 
-        self.webui = WebUI(car_connectivity=car_connectivity, host=host, port=port, username=username, password=password)
+        if 'app_config' in self.config:
+            app_config: Dict[str, str] = self.config['app_config']
+        else:
+            app_config = {}
+
+        self.webui = WebUI(car_connectivity=car_connectivity, host=host, port=port, app_config=app_config, users=users)
 
         LOG.info("Loading webui plugin with config %s", config_remove_credentials(self.config))
 

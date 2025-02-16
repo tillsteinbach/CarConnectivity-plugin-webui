@@ -14,6 +14,7 @@ import logging
 from flask_bootstrap import Bootstrap5
 import flask
 import flask_login
+import markupsafe
 
 from flask_wtf.csrf import CSRFProtect
 from flask_wtf import FlaskForm
@@ -22,6 +23,7 @@ from wtforms.validators import Length
 
 from werkzeug.serving import make_server
 
+from carconnectivity.attributes import GenericAttribute
 from carconnectivity_connectors.base.ui.connector_ui import BaseConnectorUI
 
 from carconnectivity_plugins.base.ui.plugin_ui import BasePluginUI
@@ -29,7 +31,6 @@ from carconnectivity_plugins.webui.ui.cache import cache
 from carconnectivity_plugins.webui.ui.plugins import bp_plugins
 from carconnectivity_plugins.webui.ui.connectors import bp_connectors
 from carconnectivity_plugins.webui.ui.garage import blueprint as bp_garage
-
 
 if TYPE_CHECKING:
     from typing import Dict, Optional, Literal
@@ -63,30 +64,44 @@ class WebUI:
     """
     WebUI class for the Car Connectivity application.
     """
-    def __init__(self, car_connectivity: CarConnectivity, host: str, port: int, username: Optional[str] = None, password: Optional[str] = None) -> None:
+    def __init__(self, car_connectivity: CarConnectivity, host: str, port: int, app_config: Optional[Dict[str, str]] = None,
+                 users: Optional[Dict[str, str]] = None) -> None:
+        if app_config is None:
+            app_config = {}
+        self.users: Dict[str, Dict[str, str]] = {}
+        if users is not None:
+            for user, password in users.items():
+                self.users[user] = {'password': password}
+
         self.car_connectivity: CarConnectivity = car_connectivity
         self.app = flask.Flask('CarConnectivity', template_folder=os.path.dirname(__file__) + '/templates', static_folder=os.path.dirname(__file__) + '/static')
-        self.app.debug = True
-        self.app.config.from_mapping(
-            SECRET_KEY=uuid.uuid4().hex,
-        )
+
+        for app_config_key, app_config_value in app_config.items():
+            self.app.config[app_config_key] = app_config_value
+        if 'SECRET_KEY' not in self.app.config or self.app.config['SECRET_KEY'] is None:
+            self.app.config['SECRET_KEY'] = uuid.uuid4().hex
         csrf.init_app(self.app)
 
         cache.init_app(self.app)
 
-        bootstrap = Bootstrap5(self.app)
+        bootstrap = Bootstrap5(self.app)  # pylint: disable=unused-variable # noqa
 
-        login_manager = flask_login.LoginManager()
-        login_manager.login_view = "login"
+        login_manager: flask_login.LoginManager = flask_login.LoginManager()
+        login_manager.login_view = "login"  # pyright: ignore[reportAttributeAccessIssue]
         login_manager.login_message = "You have to login to see this page"
         login_manager.login_message_category = "info"
-        if username is not None and password is not None:
-            login_manager.init_app(self.app)
-
-            self.users = {}
-            self.users[username] = {'password': password}
+        login_manager.init_app(self.app)
 
         class NoHealth(logging.Filter):
+            """
+            A logging filter that excludes health check requests from the logs.
+
+            This filter checks if the log record message contains the string 'GET /healthcheck'.
+            If the string is found, the log record is excluded from the logs.
+
+            Methods:
+                filter(record): Determines if the log record should be logged.
+            """
             def filter(self, record):
                 return 'GET /healthcheck' not in record.getMessage()
 
@@ -101,6 +116,32 @@ class WebUI:
 
         self.plugin_uis: Dict[str, BasePluginUI] = {}
         self.connector_uis: Dict[str, BaseConnectorUI] = {}
+
+        @self.app.context_processor
+        def utility_processor() -> Dict:
+            def format_cc_element(element, alt_title: Optional[str] = None, with_tooltip: bool = True, linebreak: bool = False) -> str:
+                if isinstance(element, GenericAttribute):
+                    if not element.enabled:
+                        return ''
+                    return_str: markupsafe.Markup = markupsafe.Markup()
+                    if alt_title is not None:
+                        return_str += alt_title
+                    else:
+                        return_str += markupsafe.escape(element.name)
+                    if len(return_str) > 0:
+                        return_str += ': '
+                    if with_tooltip:
+                        return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'
+                                                        f'Last changed $$${element.last_changed}$$$" class="js-convert-time-title text-decoration-none '
+                                                        'text-reset">')
+                    return_str += markupsafe.escape(f'{element.value}{' '+str(element.unit) if element.unit is not None else ""}')
+                    if with_tooltip:
+                        return_str += markupsafe.Markup('</a>')
+                    if linebreak:
+                        return_str += markupsafe.Markup('<br>')
+                    return return_str
+                return str(element)
+            return dict(format_cc_element=format_cc_element)
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:
@@ -121,6 +162,7 @@ class WebUI:
                     "sublinks": plugins_sublinks,
                     "url": flask.url_for('plugins.status')
                 },
+                {"text": "Log", "url": flask.url_for('log')},
             ]
             if 'carconnectivity_connectors_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_connectors_uis'] is not None:
                 connector_uis: Dict = flask.current_app.extensions['carconnectivity_connectors_uis']
@@ -193,7 +235,7 @@ class WebUI:
                 return
 
             user = flask_login.UserMixin()
-            user.id = username
+            user.id = username  # pyright: ignore[reportAttributeAccessIssue]
             return user
 
         @login_manager.request_loader
@@ -209,7 +251,7 @@ class WebUI:
                     user_pass = auth.split(":", 1)
                     if user_pass[0] in self.users and 'password' in self.users[user_pass[0]] and user_pass[1] == self.users[user_pass[0]]['password']:
                         user = flask_login.UserMixin()
-                        user.id = user_pass[0]
+                        user.id = user_pass[0]  # pyright: ignore[reportAttributeAccessIssue]
                         return user
             # finally, return None if both methods did not login the user
             return None
@@ -222,7 +264,7 @@ class WebUI:
                 username = form.username.data
                 if username in self.users and 'password' in self.users[username] and form.password.data == self.users[username]['password']:
                     user = flask_login.UserMixin()
-                    user.id = username
+                    user.id = username  # pyright: ignore[reportAttributeAccessIssue]
                     remember = form.remember_me.data
                     flask_login.login_user(user, remember=remember)
 
@@ -239,6 +281,14 @@ class WebUI:
         def logout():
             flask_login.logout_user()
             return flask.redirect('login')
+
+        @self.app.route('/log', methods=['GET'])
+        def log():
+            if 'car_connectivity' not in flask.current_app.extensions:
+                flask.abort(500, "car_connectivity instance not connected")
+            car_connectivity: Optional[CarConnectivity] = flask.current_app.extensions['car_connectivity']
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            return flask.render_template('log.html', current_app=flask.current_app, car_connectivity=car_connectivity, formatter=formatter)
 
         @self.app.route('/about', methods=['GET'])
         def about():

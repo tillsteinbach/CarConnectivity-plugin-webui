@@ -9,6 +9,21 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    document.addEventListener("DOMContentLoaded", function(){
+      Array.from(document.getElementsByClassName("js-convert-time-title")).forEach((element) => {
+        element.title = element.title.replace(/\$\$\$([\s0-9:\+\.\-Z]+)\$\$\$/g, (match, p1) => new Date(p1).toString());
+      });
+
+      Array.from(document.getElementsByClassName("js-convert-time")).forEach((element) => {
+        element.innerHTML = new Date(element.innerHTML).toString();
+      });
+    });
+    </script>
   {% block head %}
   {% endblock %}
 </head>
@@ -97,6 +112,7 @@
         </div>
       </footer>
     </div>
+  </div>
 </body>
 
 </html>

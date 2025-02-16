@@ -27,7 +27,7 @@
           <td>{{ "healthy" if connector.is_healthy() else "unhealthy"}}</td>
           <td>{{connector.log_level}}</td>
           <td>{{connector.version}}</td>
-          <td><p id="{{connector.id}}-last-update"></p><script type="text/javascript">document.getElementById("{{connector.id}}-last-update").innerHTML = new Date('{{connector.last_update}}').toString();</script></td>
+          <td><p class="js-convert-time">{{connector.last_update}}</p></td>
       </tr>
     {% endfor %}
   </tbody>

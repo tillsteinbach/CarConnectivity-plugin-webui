@@ -1,30 +1,28 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Garage{% endblock %}</h1>
+  {% block title %}Garage{% endblock %}
 {% endblock %}
 
 {% block content %}
   {% if garage.list_vehicles() %}
     <div class="card-deck">
     {% for vehicle in garage.list_vehicles() %}
-      <div class="card" style="width: 300px; display:inline-block;">
-        <img src="{{url_for('static', filename='icons/vehicle.webp')}}" class="card-img-top" alt="...">
-        <div class="card-body text-center">
-            <h5 class="card-title">{{vehicle.name.value if vehicle.name.enabled else vehicle.id}}</h5>
+      <div class="card" style="display:inline-block;">
+        <img src="{{ url_for('garage.vehicle_img', vin=vehicle.vin.value, fallback='icons/vehicle.png') }}" class="card-img-top bg-light" alt="..." style="width: 300px">
+        <div class="card-body" style="min-height: 300px;">
+            <h5 class="card-title text-center">
+              <a href="{{ url_for('garage.vehicle', vin=vehicle.vin.value) }}" {% if vehicle.license_plate.enabled %} data-toggle="tooltip" title="{{vehicle.license_plate}}" {% endif %} class="text-decoration-none">
+              {{vehicle.name.value if vehicle.name.enabled else vehicle.id}}
+              </a>
+            </h5>
             <p class="card-text">
-              {% if vehicle.license_plate.enabled %}
-                {{vehicle.license_plate.value}}<br/>
+              {{format_cc_element(vehicle.model, '', with_tooltip=false, linebreak=true)}}
+              {% if vehicle.drives.enabled and vehicle.drives.drives|length > 0 %}
+                Level: {% for drive in vehicle.drives.drives.values() %}{{format_cc_element(drive.level, '')}}{% if not loop.last %}, {% endif %}{% endfor %}<br>
               {% endif %}
-              {% if vehicle.model.enabled %}
-                {{vehicle.model.value}}<br/>
-              {% endif %}
-              {% if vehicle.drives.total_range.enabled %}
-                Range: {{vehicle.drives.total_range}}<br/>
-              {% endif %}
-              {% if vehicle.odometer.enabled %}
-                Odometer: {{vehicle.odometer.value}}<br/>
-              {% endif %}
+              {{format_cc_element(vehicle.drives.total_range, 'Range', linebreak=true)}}
+              {{format_cc_element(vehicle.odometer, 'Odometer', linebreak=true)}}
             </p>
             <a href="{{ url_for('garage.vehicle', vin=vehicle.vin.value) }}" class="btn btn-primary">View Vehicle</a>
         </div>

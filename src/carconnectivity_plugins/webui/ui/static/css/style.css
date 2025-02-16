@@ -27,3 +27,9 @@
     margin-left: 0.5em;
   }
 }
+
+#mapid {
+  border: 1px solid black;
+  height: 250px;  /* or as desired */
+  width: 100%;  /* This means "100% of the width of its container", the .col-md-8 */
+}

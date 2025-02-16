@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Log{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+Last {{ car_connectivity.log_storage.storage|length }} log entries:
+<textarea class="form-control form-control-sm" id="exampleFormControlTextarea1" readonly style="overflow-y:scroll; height: 800px;">
+{% for log_record in car_connectivity.log_storage.storage|reverse %}
+{{ formatter.format(log_record) }}
+{% endfor %}
+</textarea>
+{% endblock %}

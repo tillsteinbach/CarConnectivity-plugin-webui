@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+{% endblock %}
+
+{% block header %}
+  {% block title %}{{vehicle.name.value if vehicle.name.enabled else vehicle.id}}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header container-fluid">
+    <div class="row">
+      <div class="col-md-3">
+        <img src="{{ url_for('garage.vehicle_img', vin=vehicle.vin.value, fallback='icons/vehicle.png') }}"  alt="..." style="width: 100%">
+      </div>
+  {% if vehicle.position.enabled %}
+      <div style="flex: 1;" id="mapid" class="col"></div>
+
+    <script>
+      var parkingPosition = L.latLng({{ vehicle.position.latitude.value }}, {{ vehicle.position.longitude.value }});
+      var map = L.map('mapid').setView(parkingPosition, 10);
+      setTimeout(function () { map.flyToBounds([parkingPosition], { animate: true, duration: 1.0 }); }, 300);
+
+
+      const parkingTime = new Date('{{vehicle.position.latitude.last_updated}}');
+
+      var vehicleIcon = L.icon({
+        iconUrl: '{{ url_for("garage.vehicle_img", vin=vehicle.vin.value, fallback='icons/pin.png')}}',
+        iconSize: [77, 43],
+        iconAnchor: [37, 22],
+        popupAnchor: [0, -10],
+        tooltipAnchor: [37, 0],
+      });
+
+      const osm = new L.TileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 }
+      );
+
+      const hybrid = new L.TileLayer(
+        "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+        { maxZoom: 20, subdomains: ["mt0", "mt1", "mt2", "mt3"] }
+      );
+
+      new L.Control.Layers({ OSM: osm, Hybrid: hybrid }).addTo(map);
+      map.addLayer(osm);
+
+
+      L.marker([{{ vehicle.position.latitude.value }}, {{ vehicle.position.longitude.value }}], { icon: vehicleIcon }).addTo(map)
+        .bindTooltip('Parking position from ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString())
+
+    </script>
+    {% endif %}
+    </div>
+    <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#vehicle">Vehicle</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" aria-current="true" data-bs-toggle="tab" href="#specification">Specification</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#software">Software</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#drives">Drives</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#doors">Doors</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#windows">Windows</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#lights">Lights</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#charging">Charging</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#climatization">Climatization</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#position">Position</a>
+      </li>
+    </ul>
+</div>
+    <div class="card-body">
+      <form class="card-body tab-content">
+        <div class="tab-pane active" id="vehicle">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.children %}
+                {% if child.enabled and child.id not in ['images', 'commands', 'specification', 'software', 'doors', 'windows', 'lights', 'drives', 'charging', 'climatization', 'position'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="specification">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.specification.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="software">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.software.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="drives">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.drives.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="doors">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.doors.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="windows">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.windows.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="lights">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.lights.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="charging">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.charging.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="climatization">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.climatization.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="position">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.position.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
