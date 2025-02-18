@@ -168,6 +168,8 @@ class WebUI:
             ]
             if 'carconnectivity_connectors_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_connectors_uis'] is not None:
                 connector_uis: Dict = flask.current_app.extensions['carconnectivity_connectors_uis']
+                connectors_sublinks.append({"text": "Status", "url": flask.url_for('connectors.status')})
+                connectors_sublinks.append({"divider": True})
                 for connector_ui in connector_uis.values():
                     connector_nav = [
                         {
@@ -176,11 +178,11 @@ class WebUI:
                             "url": flask.url_for('connectors.status')
                         }
                     ]
-                    connectors_sublinks.append({"text": "Status", "url": flask.url_for('connectors.status')})
-                    connectors_sublinks.append({"divider": True})
                     connectors_sublinks.extend(connector_nav)
             if 'carconnectivity_plugin_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_plugin_uis'] is not None:
                 plugin_uis: Dict = flask.current_app.extensions['carconnectivity_plugin_uis']
+                plugins_sublinks.append({"text": "Status", "url": flask.url_for('plugins.status')})
+                plugins_sublinks.append({"divider": True})
                 for plugin_ui in plugin_uis.values():
                     plugin_nav = [
                         {
@@ -189,8 +191,6 @@ class WebUI:
                             "url": flask.url_for('plugins.status')
                         }
                     ]
-                    plugins_sublinks.append({"text": "Status", "url": flask.url_for('plugins.status')})
-                    plugins_sublinks.append({"divider": True})
                     plugins_sublinks.extend(plugin_nav)
             return dict(navbar=nav)
 

@@ -26,49 +26,47 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         config (Dict): Configuration dictionary containing connection details.
     """
     def __init__(self, plugin_id: str, car_connectivity: CarConnectivity, config: Dict) -> None:  # pylint: disable=too-many-branches, too-many-statements
-        BasePlugin.__init__(self, plugin_id=plugin_id, car_connectivity=car_connectivity, config=config)
+        BasePlugin.__init__(self, plugin_id=plugin_id, car_connectivity=car_connectivity, config=config, log=LOG)
 
         self.webthread: Optional[threading.Thread] = None
 
-        # Configure logging
-        if 'log_level' in config and config['log_level'] is not None:
-            config['log_level'] = config['log_level'].upper()
-            if config['log_level'] in logging._nameToLevel:
-                LOG.setLevel(config['log_level'])
-                self.log_level._set_value(config['log_level'])  # pylint: disable=protected-access
-            else:
-                raise ConfigurationError(f'Invalid log level: "{config["log_level"]}" not in {list(logging._nameToLevel.keys())}')
+        werkzeug_logger: logging.Logger = logging.getLogger('werkzeug')
+        if 'log_level' in self.active_config or not self.active_config['log_level']:
+            werkzeug_logger.setLevel(self.active_config['log_level'])
+        werkzeug_logger.addHandler(self.log_storage)
 
-        if 'host' not in self.config or not self.config['host']:
-            host: str = '0.0.0.0'
+        if 'host' not in config or not config['host']:
+            self.active_config['host'] = '0.0.0.0'
         else:
-            host: str = self.config['host']
+            self.active_config['host'] = config['host']
 
-        if 'port' in self.config and self.config['port'] is not None:
-            port: int = self.config['port']
-            if not port or port < 1 or port > 65535:
+        if 'port' in config and config['port'] is not None:
+            self.active_config['port'] = config['port']
+            if not self.active_config['port'] or self.active_config['port'] < 1 or self.active_config['port'] > 65535:
                 raise ConfigurationError('Invalid port specified in config ("port" out of range, must be 1-65535)')
         else:
-            port: int = 4000
+            self.active_config['port'] = 4000
 
         users: Dict[str, str] = {}
-        if 'username' in self.config and self.config['username'] is not None \
-                and 'password' in self.config and self.config['password'] is not None:
-            users[self.config['username']] = self.config['password']
+        if 'username' in config and config['username'] is not None \
+                and 'password' in config and config['password'] is not None:
+            users[config['username']] = config['password']
 
-        if 'users' in self.config and self.config['users'] is not None:
-            for user in self.config['users']:
+        if 'users' in config and config['users'] is not None:
+            for user in config['users']:
                 if 'username' in user and 'password' in user:
                     users[user['username']] = user['password']
+        self.active_config['passwords'] = users
 
-        if 'app_config' in self.config:
-            app_config: Dict[str, str] = self.config['app_config']
+        if 'app_config' in config:
+            self.active_config['app_config'] = config['app_config']
         else:
-            app_config = {}
+            self.active_config['app_config'] = {}
 
-        self.webui = WebUI(car_connectivity=car_connectivity, host=host, port=port, app_config=app_config, users=users)
+        self.webui = WebUI(car_connectivity=car_connectivity, host=self.active_config['host'], port=self.active_config['port'],
+                           app_config=self.active_config['app_config'], users=users)
 
-        LOG.info("Loading webui plugin with config %s", config_remove_credentials(self.config))
+        LOG.info("Loading webui plugin with config %s", config_remove_credentials(config))
 
     def startup(self) -> None:
         LOG.info("Starting WebUI plugin")
