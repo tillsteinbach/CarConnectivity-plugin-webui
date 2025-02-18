@@ -143,7 +143,29 @@ class WebUI:
                         return_str += markupsafe.Markup('<br>')
                     return return_str
                 return str(element)
-            return dict(format_cc_element=format_cc_element)
+
+            def ansi2html(ansi_str: str) -> str:
+                ansi_str = markupsafe.escape(ansi_str)
+                ansi_str = ansi_str.replace('\033[30m', markupsafe.Markup('<span style="color:black;">'))
+                ansi_str = ansi_str.replace('\033[31m', markupsafe.Markup('<span style="color:red;">'))
+                ansi_str = ansi_str.replace('\033[32m', markupsafe.Markup('<span style="color:green;">'))
+                ansi_str = ansi_str.replace('\033[33m', markupsafe.Markup('<span style="color:yellow;">'))
+                ansi_str = ansi_str.replace('\033[34m', markupsafe.Markup('<span style="color:blue;">'))
+                ansi_str = ansi_str.replace('\033[35m', markupsafe.Markup('<span style="color:magenta;">'))
+                ansi_str = ansi_str.replace('\033[36m', markupsafe.Markup('<span style="color:cyan;">'))
+                ansi_str = ansi_str.replace('\033[37m', markupsafe.Markup('<span style="color:white;">'))
+                ansi_str = ansi_str.replace('\033[90m', markupsafe.Markup('<span style="color:black;">'))
+                ansi_str = ansi_str.replace('\033[91m', markupsafe.Markup('<span style="color:red;">'))
+                ansi_str = ansi_str.replace('\033[92m', markupsafe.Markup('<span style="color:green;">'))
+                ansi_str = ansi_str.replace('\033[93m', markupsafe.Markup('<span style="color:yellow;">'))
+                ansi_str = ansi_str.replace('\033[94m', markupsafe.Markup('<span style="color:blue;">'))
+                ansi_str = ansi_str.replace('\033[95m', markupsafe.Markup('<span style="color:magenta;">'))
+                ansi_str = ansi_str.replace('\033[96m', markupsafe.Markup('<span style="color:cyan;">'))
+                ansi_str = ansi_str.replace('\033[97m', markupsafe.Markup('<span style="color:white;">'))
+                ansi_str = ansi_str.replace('\033[0m', markupsafe.Markup('</span>'))
+                return ansi_str
+
+            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html)
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:

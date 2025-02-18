@@ -5,10 +5,10 @@
 {% endblock %}
 
 {% block content %}
-Last {{ car_connectivity.log_storage.storage|length }} log entries:
-<textarea class="form-control form-control-sm  bg-dark text-light" id="exampleFormControlTextarea1" readonly style="overflow-y:scroll; height: 800px;">
+Last {{ car_connectivity.log_storage.storage|length }} log entries, latest first:
+<div class="form-control form-control-sm bg-dark text-light" style="overflow-y:scroll; height: 800px;">
 {% for log_record in car_connectivity.log_storage.storage|reverse %}
-{{ formatter.format(log_record) }}
+{{ formatter.format(log_record) }}<br>
 {% endfor %}
-</textarea>
+</div>
 {% endblock %}
