@@ -20,7 +20,7 @@ dependencies = [
     "flask-login~=0.6.3",
     "flask-caching~=2.3.0",
     "WTForms~=3.2.1",
-    "flask_wtf~=1.2.1",
+    "flask_wtf~=1.2.2",
     "pypng~=0.20220715.0",
     "Bootstrap-Flask~=2.4.1"
 ]
