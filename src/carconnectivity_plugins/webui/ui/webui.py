@@ -133,7 +133,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                     if len(return_str) > 0:
                         return_str += ': '
                     if with_tooltip:
-                        return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'
+                        return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'  # nosec
                                                         f'Last changed $$${element.last_changed}$$$" class="js-convert-time-title text-decoration-none '
                                                         'text-reset">')
                     return_str += markupsafe.escape(str(element.value))

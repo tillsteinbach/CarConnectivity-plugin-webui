@@ -36,7 +36,7 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         werkzeug_logger.addHandler(self.log_storage)
 
         if 'host' not in config or not config['host']:
-            self.active_config['host'] = '0.0.0.0'
+            self.active_config['host'] = '0.0.0.0'  # nosec
         else:
             self.active_config['host'] = config['host']
 
