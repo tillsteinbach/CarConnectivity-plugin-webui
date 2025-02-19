@@ -14,10 +14,37 @@
 
 [CarConnectivity](https://github.com/tillsteinbach/CarConnectivity) is a python API to connect to various car services. This plugin allows you to use a browser to interact with CarConnectivity.
 
+<img src="https://raw.githubusercontent.com/tillsteinbach/CarConnectivity-plugin-webui/main/screenshots/screenshot1.png" width="300">
+
 ## How to install
 
 ### Install using PIP
 If you want to use CarConnectivity Web UI, the easiest way is to obtain it from [PyPI](https://pypi.org/project/carconnectivity-plugin-webui/). Just install instead using:
 ```bash
 pip3 install carconnectivity-plugin-webui
+```
+after you installed CarConnectivity
+
+## Configuration
+In your carconnectivity.json configuration add a section for the webui plugin like this. A documentation of all possible config options can be found [here](https://github.com/tillsteinbach/CarConnectivity-plugin-webui/tree/main/doc/Config.md).
+```
+{
+    "carConnectivity": {
+        "connectors": [
+            ...
+        ]
+        "plugins": [
+            {
+                "type": "webui",
+                "config": {}
+            }
+        ]
+    }
+}
+```
+
+## Updates
+If you want to update, the easiest way is:
+```bash
+pip3 install carconnectivity-plugin-webui --upgrade
 ```

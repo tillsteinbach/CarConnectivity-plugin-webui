@@ -53,8 +53,16 @@ These are the valid options for the Web UI plugin
                     "log_level": "error", // The log level for the plugin. Otherwise uses the global log level
                     "host": "localhost", // The host to listen on, default is 0.0.0.0 meaning all interfaces
                     "port": 4000, // Port to listen on, default is 4000, to run on port 80 CarConnectivity must run with priviliges
-                    "username": "admin", //Admin username to login
-                    "password": "secret" //Admin password to login
+                    "username": "admin", // Admin username for login
+                    "password": "secret", // Admin password for login
+                    "users": [{ // Additional users
+                        "username": "testuser",
+                        "password": "testpassword"
+                    }],
+                    "app_config": { // Special configuration parameters
+                        "SECRET_KEY": "3edf9a3f2131232e55be5b07269061f848", // SECRET_KEY can be set fixed (otherwise session cookies will invalidate more often)
+                        "LOGIN_DISABLED": true, // If you prefere to not use password security at all (use this with caution and only if the webinterface is not reachable from the internet)
+                    }
                 }
             }
         ]
