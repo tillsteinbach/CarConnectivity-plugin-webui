@@ -36,12 +36,19 @@ In your carconnectivity.json configuration add a section for the webui plugin li
         "plugins": [
             {
                 "type": "webui",
-                "config": {}
+                "config": {
+                    "username": "admin", // Admin username for login
+                    "password": "secret" // Admin password for login
+                }
             }
         ]
     }
 }
 ```
+
+## How to use
+You will default find the webinterface on http port 4000 on the machine that is hosting carconnectivity. You can change interface with the `host` parameter and the port with the `port parameter`.
+Always set your personal username and password to protect your data from theft.
 
 ## Updates
 If you want to update, the easiest way is:
