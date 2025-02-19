@@ -166,7 +166,7 @@ class WebUI:
                 ansi_str = ansi_str.replace('\033[0m', markupsafe.Markup('</span>'))
                 return ansi_str
 
-            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html, timedelta=timedelta)
+            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html, timedelta=timedelta, hasattr=hasattr)
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:
@@ -189,8 +189,8 @@ class WebUI:
                 },
                 {"text": "Log", "url": flask.url_for('log')},
             ]
-            if 'carconnectivity_connectors_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_connectors_uis'] is not None:
-                connector_uis: Dict = flask.current_app.extensions['carconnectivity_connectors_uis']
+            if 'carconnectivity_connector_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_connector_uis'] is not None:
+                connector_uis: Dict = flask.current_app.extensions['carconnectivity_connector_uis']
                 connectors_sublinks.append({"text": "Status", "url": flask.url_for('connectors.status')})
                 connectors_sublinks.append({"divider": True})
                 for connector_ui in connector_uis.values():
@@ -360,7 +360,7 @@ class WebUI:
         for connector in self.car_connectivity.connectors.connectors.values():
             parent_name = '.'.join(connector.__module__.split('.')[:-1])
             try:
-                conenctor_ui_module: ModuleType = importlib.import_module('.ui.conenctor_ui', parent_name)
+                conenctor_ui_module: ModuleType = importlib.import_module('.ui.connector_ui', parent_name)
                 connector_ui_class = getattr(conenctor_ui_module, 'ConnectorUI')
                 connector_ui_instance: BaseConnectorUI = connector_ui_class(connector)
                 self.connector_uis[connector.get_type()] = connector_ui_instance

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Connector {{connector.id}} Log{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+Last {{ connector.log_storage.storage|length }} log entries, latest first:
+<div class="form-control form-control-sm bg-dark text-light" style="overflow-y:scroll; height: 800px;">
+{% for log_record in connector.log_storage.storage|reverse %}
+{{ ansi2html(formatter.format(log_record)) }}<br>
+{% endfor %}
+</div>
+{% if connector.api_log_storage.storage|length > 0 %}
+<h2>API Debug Log:</h2>
+Last {{ connector.api_log_storage.storage|length }} log entries, latest first:
+<div class="form-control form-control-sm bg-dark text-light" style="overflow-y:scroll; height: 800px;">
+{% for log_record in connector.api_log_storage.storage|reverse %}
+{{ ansi2html(formatter.format(log_record)) }}<br>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
