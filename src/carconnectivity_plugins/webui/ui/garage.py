@@ -98,8 +98,7 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
     if vehicle_obj is None:
         if 'fallback' in flask.request.args:
             return flask.redirect(flask.url_for('static', filename=flask.request.args.get('fallback')))
-        else:
-            flask.abort(404, f"Vehicle with VIN {vin} not found")
+        flask.abort(404, f"Vehicle with VIN {vin} not found")
 
     else:
         img_io = io.BytesIO()
@@ -107,8 +106,7 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
                 or vehicle_obj.images.images['car_picture'].value is None:
             if 'fallback' in flask.request.args:
                 return flask.redirect(flask.url_for('static', filename=flask.request.args.get('fallback')))
-            else:
-                flask.abort(404, f"Vehicle with VIN {vin} has no car picture")
+            flask.abort(404, f"Vehicle with VIN {vin} has no car picture")
         vehicle_obj.images.images['car_picture'].value.save(img_io, 'PNG')
         img_io.seek(0)
         if conversion == '.json':
@@ -117,5 +115,4 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
             json_map['encoding'] = 'base64'
             json_map['data'] = b64encode(img_io.read()).decode()
             return flask.Response(json.dumps(json_map), mimetype='application/json')
-        else:
-            return flask.send_file(img_io, mimetype='image/png')
+        return flask.send_file(img_io, mimetype='image/png')

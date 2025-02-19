@@ -61,10 +61,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class WebUI:
+class WebUI:  # pylint: disable=too-few-public-methods
     """
     WebUI class for the Car Connectivity application.
     """
+    # pylint: disable-next=too-many-arguments, too-many-positional-arguments, too-many-locals, too-many-statements
     def __init__(self, car_connectivity: CarConnectivity, host: str, port: int, app_config: Optional[Dict[str, str]] = None,
                  users: Optional[Dict[str, str]] = None) -> None:
         if app_config is None:
@@ -93,7 +94,7 @@ class WebUI:
         login_manager.login_message_category = "info"
         login_manager.init_app(self.app)
 
-        class NoHealth(logging.Filter):
+        class NoHealth(logging.Filter):  # pylint: disable=too-few-public-methods
             """
             A logging filter that excludes health check requests from the logs.
 
@@ -166,7 +167,7 @@ class WebUI:
                 ansi_str = ansi_str.replace('\033[0m', markupsafe.Markup('</span>'))
                 return ansi_str
 
-            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html, timedelta=timedelta, hasattr=hasattr)
+            return {'format_cc_element': format_cc_element, 'ansi2html': ansi2html, 'timedelta': timedelta, 'hasattr': hasattr}
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:
@@ -215,7 +216,7 @@ class WebUI:
                         }
                     ]
                     plugins_sublinks.extend(plugin_nav)
-            return dict(navbar=nav)
+            return {'navbar': nav}
 
         @self.app.before_request
         def before_request_callback():
@@ -255,9 +256,9 @@ class WebUI:
             return flask.render_template('restart.html', current_app=flask.current_app)
 
         @login_manager.user_loader
-        def user_loader(username):
+        def user_loader(username) -> None | flask_login.UserMixin:
             if username not in self.users:
-                return
+                return None
 
             user = flask_login.UserMixin()
             user.id = username  # pyright: ignore[reportAttributeAccessIssue]
@@ -295,9 +296,9 @@ class WebUI:
 
                     next_page = flask.request.args.get('next', default='garage')
                     return flask.redirect(next_page)
-                else:
-                    form.password.data = ''
-                    flask.flash('User unknown or password is wrong', 'danger')
+
+                form.password.data = ''
+                flask.flash('User unknown or password is wrong', 'danger')
 
             return flask.render_template('login/login.html', form=form, current_app=self.app)
 
@@ -320,9 +321,11 @@ class WebUI:
             if 'car_connectivity' not in flask.current_app.extensions:
                 flask.abort(500, "car_connectivity instance not connected")
             car_connectivity: Optional[CarConnectivity] = flask.current_app.extensions['car_connectivity']
-            versions = dict()
+            versions: Dict[str, str] = {}
             if car_connectivity is not None:
-                versions['CarConnectivity'] = car_connectivity.version
+                if car_connectivity.version is not None and car_connectivity.version.enabled \
+                        and car_connectivity.version.value is not None:
+                    versions['CarConnectivity'] = car_connectivity.version.value
                 if car_connectivity.connectors is not None and car_connectivity.connectors.enabled:
                     for connector in car_connectivity.connectors.connectors.values():
                         versions[connector.get_type()] = connector.get_version()

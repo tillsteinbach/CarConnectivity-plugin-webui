@@ -22,7 +22,7 @@ class PluginUI(BasePluginUI):
                                                                     template_folder=os.path.dirname(__file__) + '/templates')
         super().__init__(plugin, blueprint=blueprint)
 
-    def get_nav_items(self) -> List[Dict[Literal['text', 'url', 'sublinks', 'divider'], Union[str, List]]]:
+    def get_nav_items(self) -> List[Dict[Literal['text', 'url', 'sublinks', 'divider'], Union[str, List]]]:  # pylint: disable=useless-parent-delegation
         """
         Generates a list of navigation items for the WebUI plugin UI.
         """
