@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import importlib
 
+from datetime import timedelta
 import base64
 import threading
 import time
@@ -165,7 +166,7 @@ class WebUI:
                 ansi_str = ansi_str.replace('\033[0m', markupsafe.Markup('</span>'))
                 return ansi_str
 
-            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html)
+            return dict(format_cc_element=format_cc_element, ansi2html=ansi2html, timedelta=timedelta)
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:
