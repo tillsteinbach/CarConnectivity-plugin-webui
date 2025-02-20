@@ -11,6 +11,20 @@ if TYPE_CHECKING:
 bp_plugins = flask.Blueprint('plugins', __name__, url_prefix='/plugins')
 
 
+@bp_plugins.route('/', methods=['GET'])
+def root():
+    """
+    Redirects to the 'plugins.status' URL.
+
+    This function uses Flask's redirect and url_for functions to redirect
+    the user to the 'plugins.status' endpoint.
+
+    Returns:
+        A Flask redirect response to the 'plugins.status' URL.
+    """
+    return flask.redirect(flask.url_for('plugins.status'))
+
+
 @bp_plugins.route('/status', methods=['GET'])
 @login_required
 def status() -> str:
