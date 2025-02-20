@@ -31,7 +31,7 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         self.webthread: Optional[threading.Thread] = None
 
         werkzeug_logger: logging.Logger = logging.getLogger('werkzeug')
-        if 'log_level' in self.active_config or not self.active_config['log_level']:
+        if 'log_level' in self.active_config and self.active_config['log_level'] is not None:
             werkzeug_logger.setLevel(self.active_config['log_level'])
         werkzeug_logger.addHandler(self.log_storage)
 
