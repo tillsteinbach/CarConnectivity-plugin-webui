@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import importlib
 
+from enum import Enum
 from datetime import timedelta
 import base64
 import threading
@@ -25,6 +26,7 @@ from wtforms.validators import Length
 from werkzeug.serving import make_server
 
 from carconnectivity.attributes import GenericAttribute
+from carconnectivity.objects import GenericObject
 from carconnectivity_connectors.base.ui.connector_ui import BaseConnectorUI
 
 from carconnectivity_plugins.base.ui.plugin_ui import BasePluginUI
@@ -136,11 +138,25 @@ class WebUI:  # pylint: disable=too-few-public-methods
                         return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'  # nosec
                                                         f'Last changed $$${element.last_changed}$$$" class="js-convert-time-title text-decoration-none '
                                                         'text-reset">')
-                    return_str += markupsafe.escape(str(element.value))
+                    if isinstance(element.value, Enum):
+                        value = element.value.value
+                    else:
+                        value = element.value
+                    return_str += markupsafe.escape(str(value))
                     if element.unit is not None:
                         return_str += markupsafe.escape(str(element.unit))
                     if with_tooltip:
                         return_str += markupsafe.Markup('</a>')
+                    if linebreak:
+                        return_str += markupsafe.Markup('<br>')
+                    return return_str
+                if isinstance(element, GenericObject):
+                    if not element.enabled:
+                        return ''
+                    return_str: markupsafe.Markup = markupsafe.Markup()
+                    for child in element.children:
+                        if child.enabled:
+                            return_str += format_cc_element(child, child.id, with_tooltip, linebreak)
                     if linebreak:
                         return_str += markupsafe.Markup('<br>')
                     return return_str
