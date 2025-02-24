@@ -80,7 +80,8 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         Shuts down the connector by persisting current state, closing the session,
         and cleaning up resources.
         """
-        self.webui.server.shutdown()
+        if self.webthread is not None and self.webthread.is_alive():
+            self.webui.server.shutdown()
         return super().shutdown()
 
     def get_version(self) -> str:
