@@ -90,6 +90,9 @@
         <a class="nav-link" data-bs-toggle="tab" href="#climatization">Climatization</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#maintenance">Maintenance</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#position">Position</a>
       </li>
     </ul>
@@ -107,7 +110,7 @@
               </thead>
               <tbody>
                 {% for child in vehicle.children %}
-                {% if child.enabled and child.id not in ['images', 'commands', 'specification', 'software', 'doors', 'windows', 'lights', 'drives', 'charging', 'climatization', 'position'] %}
+                {% if child.enabled and child.id not in ['images', 'commands', 'specification', 'software', 'doors', 'windows', 'lights', 'drives', 'charging', 'climatization', 'maintenance', 'position'] %}
                 <tr>
                   <td>{{child.id}}</td>
                   <td>{{child}}</td>
@@ -285,6 +288,28 @@
               </thead>
               <tbody>
                 {% for child in vehicle.climatization.children %}
+                {% if child.enabled and child.id not in ['commands'] %}
+                <tr>
+                  <td>{{child.id}}</td>
+                  <td>{{child}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </p>
+        </div>
+        <div class="tab-pane" id="maintenance">
+          <p class="card-text">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Attribute</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in vehicle.maintenance.children %}
                 {% if child.enabled and child.id not in ['commands'] %}
                 <tr>
                   <td>{{child.id}}</td>
