@@ -69,7 +69,8 @@ class WebUI:  # pylint: disable=too-few-public-methods
     """
     # pylint: disable-next=too-many-arguments, too-many-positional-arguments, too-many-locals, too-many-statements
     def __init__(self, car_connectivity: CarConnectivity, host: str, port: int, app_config: Optional[Dict[str, str]] = None,
-                 users: Optional[Dict[str, str]] = None) -> None:
+                 users: Optional[Dict[str, str]] = None, locale: Optional[str] = None) -> None:
+        self.locale: Optional[str] = locale
         if app_config is None:
             app_config = {}
         self.users: Dict[str, Dict[str, str]] = {}
@@ -138,13 +139,14 @@ class WebUI:  # pylint: disable=too-few-public-methods
                         return_str += markupsafe.Markup(f'<a href="#" data-toggle="tooltip" title="Last updated $$${element.last_updated}$$$ &#10;'  # nosec
                                                         f'Last changed $$${element.last_changed}$$$" class="js-convert-time-title text-decoration-none '
                                                         'text-reset">')
+                    unit = None
                     if isinstance(element.value, Enum):
                         value = element.value.value
                     else:
-                        value = element.value
+                        value, unit = element.in_locale(locale=self.locale)
                     return_str += markupsafe.escape(str(value))
-                    if element.unit is not None:
-                        return_str += markupsafe.escape(str(element.unit))
+                    if unit is not None:
+                        return_str += markupsafe.escape(str(unit))
                     if with_tooltip:
                         return_str += markupsafe.Markup('</a>')
                     if linebreak:

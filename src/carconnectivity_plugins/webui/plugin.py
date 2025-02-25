@@ -58,13 +58,18 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
                     users[user['username']] = user['password']
         self.active_config['passwords'] = users
 
+        if 'locale' in config:
+            self.active_config['locale'] = config['locale']
+        else:
+            self.active_config['locale'] = 'en_DE'
+
         if 'app_config' in config:
             self.active_config['app_config'] = config['app_config']
         else:
             self.active_config['app_config'] = {}
 
         self.webui = WebUI(car_connectivity=car_connectivity, host=self.active_config['host'], port=self.active_config['port'],
-                           app_config=self.active_config['app_config'], users=users)
+                           app_config=self.active_config['app_config'], users=users, locale=self.active_config['locale'])
 
         LOG.info("Loading webui plugin with config %s", config_remove_credentials(config))
 
