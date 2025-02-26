@@ -77,6 +77,7 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         LOG.info("Starting WebUI plugin")
         self.webui.load_blueprints()
         self.webthread = threading.Thread(target=self.webui.server.serve_forever)
+        self.webthread.name = 'carconnectivity.plugins.webui-webthread'
         self.webthread.start()
         LOG.debug("Starting WebUI plugin done")
 
