@@ -144,6 +144,9 @@ class WebUI:  # pylint: disable=too-few-public-methods
                         value = element.value.value
                     else:
                         value, unit = element.in_locale(locale=self.locale)
+                        # if isinstance(value, (float, int)):
+                        #     from decimal import Decimal
+                        #     value = '{0:n}'.format(Decimal(value))
                     return_str += markupsafe.escape(str(value))
                     if unit is not None:
                         return_str += markupsafe.escape(str(unit))

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import logging
 import threading
+import locale
 
 from carconnectivity.errors import ConfigurationError
 from carconnectivity.util import config_remove_credentials
@@ -58,10 +59,16 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
                     users[user['username']] = user['password']
         self.active_config['passwords'] = users
 
-        if 'locale' in config:
+        if 'locale' in config and config['locale'] is not None:
             self.active_config['locale'] = config['locale']
+            try:
+                locale.setlocale(locale.LC_ALL, self.active_config['locale'])
+                if self.active_config['time_format'] is None or self.active_config['time_format'] == '':
+                    self.active_config['time_format'] = locale.nl_langinfo(locale.D_T_FMT)
+            except locale.Error as err:
+                raise ConfigurationError('Invalid locale specified in config ("locale" must be a valid locale)') from err
         else:
-            self.active_config['locale'] = 'en_DE'
+            self.active_config['locale'] = locale.getlocale()[0]
 
         if 'app_config' in config:
             self.active_config['app_config'] = config['app_config']
