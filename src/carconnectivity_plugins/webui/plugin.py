@@ -28,7 +28,6 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
     """
     def __init__(self, plugin_id: str, car_connectivity: CarConnectivity, config: Dict) -> None:  # pylint: disable=too-many-branches, too-many-statements
         BasePlugin.__init__(self, plugin_id=plugin_id, car_connectivity=car_connectivity, config=config, log=LOG)
-        self._healthy: bool = False
 
         self.webthread: Optional[threading.Thread] = None
 
@@ -87,7 +86,7 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         self.webthread = threading.Thread(target=self.webui.server.serve_forever)
         self.webthread.name = 'carconnectivity.plugins.webui-webthread'
         self.webthread.start()
-        self._healthy = True
+        self.healthy._set_value(value=True)  # pylint: disable=protected-access
         LOG.debug("Starting WebUI plugin done")
 
     def shutdown(self) -> None:
@@ -105,5 +104,5 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
     def get_type(self) -> str:
         return "carconnectivity-plugin-webui"
 
-    def is_healthy(self) -> bool:
-        return self._healthy and super().is_healthy()
+    def get_name(self) -> str:
+        return "WebUI Plugin"
