@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - No unreleased changes so far
 
+## [0.2] - 2025-03-02
+### Added
+- Default take locale from system
+- Convert values to unit of locale
+- Added Maintainance view in vehicle status page
+
 ## [0.1.2] - 2025-02-20
 ### Fixes
 - Fix bug when loglevel is not configured
