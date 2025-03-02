@@ -124,6 +124,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
 
         @self.app.context_processor
         def utility_processor() -> Dict:
+            # pylint: disable-next=too-many-branches
             def format_cc_element(element, alt_title: Optional[str] = None, with_tooltip: bool = True, linebreak: bool = False) -> str:
                 if isinstance(element, GenericAttribute):
                     if not element.enabled:
