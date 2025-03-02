@@ -22,7 +22,8 @@ All notable changes to this project will be documented in this file.
 ## [0.1] - 2025-02-19
 Initial release, let's go and give this to the public to try out...
 
-[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.1.2...HEAD
+[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.2...HEAD
+[0.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.2
 [0.1.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.1.2
 [0.1.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.1.1
 [0.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.1
