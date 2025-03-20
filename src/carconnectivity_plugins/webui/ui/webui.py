@@ -331,6 +331,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
             return flask.redirect('login')
 
         @self.app.route('/log', methods=['GET'])
+        @flask_login.login_required
         def log():
             if 'car_connectivity' not in flask.current_app.extensions:
                 flask.abort(500, "car_connectivity instance not connected")
