@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - No unreleased changes so far
 
+## [0.3] - 2025-03-02
+### Added
+- Support for window heating attributes
+- More error output for locales
+
 ## [0.2] - 2025-03-02
 ### Added
 - Default take locale from system
@@ -22,7 +27,8 @@ All notable changes to this project will be documented in this file.
 ## [0.1] - 2025-02-19
 Initial release, let's go and give this to the public to try out...
 
-[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.2...HEAD
+[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.3...HEAD
+[0.3]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.3
 [0.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.2
 [0.1.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.1.2
 [0.1.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.1.1
