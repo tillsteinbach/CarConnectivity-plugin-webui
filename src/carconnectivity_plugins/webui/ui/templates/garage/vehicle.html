@@ -63,41 +63,61 @@
       <li class="nav-item">
         <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#vehicle">Vehicle</a>
       </li>
+      {% if vehicle.specification.enabled %}
       <li class="nav-item">
         <a class="nav-link" aria-current="true" data-bs-toggle="tab" href="#specification">Specification</a>
       </li>
+      {% endif %}
+      {% if vehicle.software.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#software">Software</a>
       </li>
+      {% endif %}
+      {% if vehicle.drives.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#drives">Drives</a>
       </li>
+      {% endif %}
+      {% if vehicle.doors.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#doors">Doors</a>
       </li>
+      {% endif %}
+      {% if vehicle.windows.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#windows">Windows</a>
       </li>
+      {% endif %}
+      {% if vehicle.lights.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#lights">Lights</a>
       </li>
-      {% if hasattr(vehicle, 'charging') %}
+      {% endif %}
+      {% if hasattr(vehicle, 'charging') and vehicle.charging.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#charging">Charging</a>
       </li>
       {% endif %}
+      {% if vehicle.climatization.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#climatization">Climatization</a>
       </li>
+      {% endif %}
+      {% if vehicle.window_heatings.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#window_heating">Window Heating</a>
       </li>
+      {% endif %}
+      {% if vehicle.maintenance.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#maintenance">Maintenance</a>
       </li>
+      {% endif %}
+      {% if vehicle.position.enabled %}
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#position">Position</a>
       </li>
+      {% endif %}
     </ul>
 </div>
     <div class="card-body">
