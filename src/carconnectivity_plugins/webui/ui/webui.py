@@ -351,10 +351,10 @@ class WebUI:  # pylint: disable=too-few-public-methods
                     versions['CarConnectivity'] = car_connectivity.version.value
                 if car_connectivity.connectors is not None and car_connectivity.connectors.enabled:
                     for connector in car_connectivity.connectors.connectors.values():
-                        versions[connector.get_type()] = connector.get_version()
+                        versions[connector.id] = connector.get_version()
                 if car_connectivity.plugins is not None and car_connectivity.plugins.enabled:
                     for plugin in car_connectivity.plugins.plugins.values():
-                        versions[plugin.get_type()] = plugin.get_version()
+                        versions[plugin.id] = plugin.get_version()
             return flask.render_template('about.html', current_app=flask.current_app, versions=versions)
 
     def load_blueprints(self) -> None:
@@ -376,7 +376,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 plugin_ui_module: ModuleType = importlib.import_module('.ui.plugin_ui', parent_name)
                 plugin_ui_class = getattr(plugin_ui_module, 'PluginUI')
                 plugin_ui_instance: BasePluginUI = plugin_ui_class(plugin)
-                self.plugin_uis[plugin.get_type()] = plugin_ui_instance
+                self.plugin_uis[plugin.id] = plugin_ui_instance
                 if plugin_ui_instance.blueprint is not None:
                     bp_plugins.register_blueprint(plugin_ui_instance.blueprint)
             except ModuleNotFoundError:
@@ -389,7 +389,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 conenctor_ui_module: ModuleType = importlib.import_module('.ui.connector_ui', parent_name)
                 connector_ui_class = getattr(conenctor_ui_module, 'ConnectorUI')
                 connector_ui_instance: BaseConnectorUI = connector_ui_class(connector)
-                self.connector_uis[connector.get_type()] = connector_ui_instance
+                self.connector_uis[connector.id] = connector_ui_instance
                 if connector_ui_instance.blueprint is not None:
                     bp_connectors.register_blueprint(connector_ui_instance.blueprint)
             except ModuleNotFoundError:

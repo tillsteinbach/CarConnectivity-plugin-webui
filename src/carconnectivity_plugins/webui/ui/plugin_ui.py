@@ -18,8 +18,8 @@ class PluginUI(BasePluginUI):
     A user interface class for the WebUI plugin in the Car Connectivity application.
     """
     def __init__(self, plugin: BasePlugin):
-        blueprint: Optional[flask.Blueprint] = flask.Blueprint(name='webui', import_name='carconnectivity-plugin-webui', url_prefix='/webui',
-                                                                    template_folder=os.path.dirname(__file__) + '/templates')
+        blueprint: Optional[flask.Blueprint] = flask.Blueprint(name=plugin.id, import_name='carconnectivity-plugin-webui', url_prefix=f'/{plugin.id}',
+                                                               template_folder=os.path.dirname(__file__) + '/templates')
         super().__init__(plugin, blueprint=blueprint)
 
     def get_nav_items(self) -> List[Dict[Literal['text', 'url', 'sublinks', 'divider'], Union[str, List]]]:  # pylint: disable=useless-parent-delegation
