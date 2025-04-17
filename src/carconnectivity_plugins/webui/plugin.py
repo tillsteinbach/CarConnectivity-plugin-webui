@@ -59,6 +59,11 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
                     users[user['username']] = user['password']
         self.active_config['passwords'] = users
 
+        if 'time_format' in config and config['time_format'] is not None:
+            self.active_config['time_format'] = config['time_format']
+        else:
+            self.active_config['time_format'] = None
+
         if 'locale' in config and config['locale'] is not None:
             self.active_config['locale'] = config['locale']
             try:
