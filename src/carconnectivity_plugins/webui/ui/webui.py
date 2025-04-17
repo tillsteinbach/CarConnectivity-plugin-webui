@@ -6,6 +6,7 @@ import importlib
 
 from enum import Enum
 from datetime import timedelta
+from decimal import Decimal
 import base64
 import threading
 import time
@@ -25,7 +26,7 @@ from wtforms.validators import Length
 
 from werkzeug.serving import make_server
 
-from carconnectivity.attributes import GenericAttribute
+from carconnectivity.attributes import GenericAttribute, FloatAttribute
 from carconnectivity.objects import GenericObject
 from carconnectivity_connectors.base.ui.connector_ui import BaseConnectorUI
 
@@ -143,11 +144,20 @@ class WebUI:  # pylint: disable=too-few-public-methods
                     unit = None
                     if isinstance(element.value, Enum):
                         value = element.value.value
+                    elif isinstance(element, FloatAttribute):
+                        value, unit = element.in_locale(locale=self.locale)
+                        if value is not None and element.precision is not None:
+                            precision_digits = 0
+                            precision_tmp = element.precision
+                            while precision_tmp < 1:
+                                precision_digits += 1
+                                precision_tmp *= 10
+                            value = round(value, precision_digits)
+                            value = '{0:.{1}f}'.format(value, precision_digits)  # pylint: disable=consider-using-f-string
+                        elif value is not None:
+                            value = '{0:n}'.format(Decimal(value))  # pylint: disable=consider-using-f-string
                     else:
                         value, unit = element.in_locale(locale=self.locale)
-                        # if isinstance(value, (float, int)):
-                        #     from decimal import Decimal
-                        #     value = '{0:n}'.format(Decimal(value))
                     return_str += markupsafe.escape(str(value))
                     if unit is not None:
                         return_str += markupsafe.escape(str(unit))
