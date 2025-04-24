@@ -58,11 +58,11 @@ These are the valid options for the Web UI plugin
                     "users": [{ // Additional users
                         "username": "testuser",
                         "password": "testpassword"
-                    }],
                     "app_config": { // Special configuration parameters
                         "SECRET_KEY": "3edf9a3f2131232e55be5b07269061f848", // SECRET_KEY can be set fixed (otherwise session cookies will invalidate more often)
                         "LOGIN_DISABLED": true, // If you prefere to not use password security at all (use this with caution and only if the webinterface is not reachable from the internet)
                     }
+                    }],
                 }
             }
         ]
