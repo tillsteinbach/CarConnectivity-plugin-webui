@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - No unreleased changes so far
 
+## [0.5.2] - 2025-11-02
+### Changed
+- Updated dependencies
+
+### Fixed
+- Hide window heating from overview and only dispaly in extra tab (thanks to user @acfischer42)
+
 ## [0.5.1] - 2025-06-20
 ### Changed
 - Updated dependencies
