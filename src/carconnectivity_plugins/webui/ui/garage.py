@@ -9,6 +9,15 @@ from base64 import b64encode
 import flask
 from flask_login import login_required
 
+# pylint: disable=duplicate-code
+SUPPORT_IMAGES = False  # pylint: disable=invalid-name
+try:
+    from PIL import Image  # pylint: disable=unused-import # noqa: F401
+    SUPPORT_IMAGES = True  # pylint: disable=invalid-name
+except ImportError:
+    pass
+# pylint: enable=duplicate-code
+
 if TYPE_CHECKING:
     from typing import Optional, Dict
 
@@ -100,6 +109,10 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
             return flask.redirect(flask.url_for('static', filename=flask.request.args.get('fallback')))
         flask.abort(404, f"Vehicle with VIN {vin} not found")
 
+    elif not SUPPORT_IMAGES:
+        if 'fallback' in flask.request.args:
+            return flask.redirect(flask.url_for('static', filename=flask.request.args.get('fallback')))
+        flask.abort(500, "PIL module not available, cannot serve vehicle images")
     else:
         img_io = io.BytesIO()
         if 'car_picture' not in vehicle_obj.images.images or not vehicle_obj.images.images['car_picture'].enabled \
