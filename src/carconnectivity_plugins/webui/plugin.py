@@ -16,6 +16,19 @@ if TYPE_CHECKING:
     from typing import Dict, Optional
     from carconnectivity.carconnectivity import CarConnectivity
 
+# pylint: disable=duplicate-code
+SUPPORT_IMAGES: bool = False  # pylint: disable=invalid-name
+SUPPORT_IMAGES_STR: str = ""  # pylint: disable=invalid-name
+try:
+    import PIL  # pylint: disable=unused-import # noqa_F401
+    SUPPORT_IMAGES = True  # pylint: disable=invalid-name
+except ImportError as exc:
+    if str(exc) == "No module named 'PIL'":
+        SUPPORT_IMAGES_STR = str(exc) + " (cannot find pillow library)"
+    else:
+        SUPPORT_IMAGES_STR = str(exc)  # pylint: disable=invalid-name
+# pylint: enable=duplicate-code
+
 LOG: logging.Logger = logging.getLogger("carconnectivity.plugins.webui")
 
 
@@ -105,6 +118,11 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
 
     def get_version(self) -> str:
         return __version__
+
+    def get_features(self) -> dict[str, tuple[bool, str]]:
+        features: dict[str, tuple[bool, str]] = {}
+        features['Images'] = (SUPPORT_IMAGES, SUPPORT_IMAGES_STR)
+        return features
 
     def get_type(self) -> str:
         return "carconnectivity-plugin-webui"

@@ -13,6 +13,7 @@
           <th>Plugin Status</th>
           <th>Log Level</th>
           <th>Version</th>
+          <th>Optional Features</th>
       </tr>
   </thead>
   <tbody>
@@ -25,7 +26,14 @@
           <td>{{plugin.id}}</td>
           <td>{{ "healthy" if plugin.is_healthy() else "unhealthy"}}</td>
           <td>{{plugin.log_level}}</td>
-          <td>{{plugin.version}}</td>
+          <td>{{plugin.get_version()}}</td>
+          <td>
+            <ul>
+              {% for feature_name, features_status in plugin.get_features().items() %}
+              <li>{{feature_name}}: {{ "enabled" if features_status[0] else "disabled -  "+features_status[1]}}</li>
+              {% endfor %}
+            </ul>
+          </td>
       </tr>
     {% endfor %}
   </tbody>

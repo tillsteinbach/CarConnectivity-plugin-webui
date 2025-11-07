@@ -13,6 +13,7 @@
           <th>Connector Status</th>
           <th>Log Level</th>
           <th>Version</th>
+          <th>Optional Features</th>
           <th>Last Update</th>
       </tr>
   </thead>
@@ -26,7 +27,14 @@
           <td>{{connector.id}}</td>
           <td>{{ "healthy" if connector.is_healthy() else "unhealthy"}}</td>
           <td>{{connector.log_level}}</td>
-          <td>{{connector.version}}</td>
+          <td>{{connector.get_version()}}</td>
+          <td>
+            <ul>
+              {% for feature in connector.get_features() %}
+              <li>{{feature}}</li>
+              {% endfor %}
+            </ul>
+          </td>
           <td><p class="js-convert-time">{{connector.last_update}}</p></td>
       </tr>
     {% endfor %}
