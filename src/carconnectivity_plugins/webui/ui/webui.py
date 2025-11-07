@@ -125,6 +125,48 @@ class WebUI:  # pylint: disable=too-few-public-methods
 
         @self.app.context_processor
         def utility_processor() -> Dict:  # pylint: disable=too-many-statements
+            def format_attribute_name(attr_id: str) -> str:
+                """Format attribute ID into a human-readable label."""
+                # Special handling for common battery-related attributes
+                battery_attrs = {
+                    'battery_charge_percent': 'Battery Charge',
+                    'state_of_charge': 'Battery State of Charge',
+                    'soc': 'Battery State of Charge',
+                    'battery_level': 'Battery Level',
+                    'level': 'Battery Level',
+                    'battery_temperature': 'Battery Temperature',
+                    'battery_temp': 'Battery Temperature',
+                    'temperature': 'Battery Temperature',
+                    'temperature_min': 'Battery Temperature (Min)',
+                    'temperature_max': 'Battery Temperature (Max)',
+                    'battery_voltage': 'Battery Voltage',
+                    'battery_current': 'Battery Current',
+                    'battery_power': 'Battery Power',
+                    'battery_capacity': 'Battery Capacity',
+                    'battery_health': 'Battery Health',
+                }
+
+                # Check if it's a known battery attribute
+                attr_lower = attr_id.lower()
+                if attr_lower in battery_attrs:
+                    return battery_attrs[attr_lower]
+
+                # Check if it contains battery/soc and add prefix
+                if 'battery' in attr_lower or 'soc' in attr_lower:
+                    # Format: replace underscores, capitalize each word
+                    formatted = attr_id.replace('_', ' ').title()
+                    if not formatted.startswith('Battery'):
+                        formatted = 'Battery ' + formatted
+                    return formatted
+
+                # Check if it contains temp/temperature and might be battery-related
+                if 'temp' in attr_lower and 'battery' not in attr_lower:
+                    formatted = attr_id.replace('_', ' ').title()
+                    return 'Battery ' + formatted.replace('Temp', 'Temperature')
+
+                # Default: just format the ID nicely
+                return attr_id.replace('_', ' ').title()
+
             # pylint: disable-next=too-many-branches
             def format_cc_element(element, alt_title: Optional[str] = None, with_tooltip: bool = True, linebreak: bool = False) -> str:
                 if isinstance(element, GenericAttribute):
@@ -172,7 +214,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                     return_str: markupsafe.Markup = markupsafe.Markup()
                     for child in element.children:
                         if child.enabled:
-                            return_str += format_cc_element(child, child.id, with_tooltip, linebreak)
+                            return_str += format_cc_element(child, format_attribute_name(child.id), with_tooltip, linebreak)
                     if linebreak:
                         return_str += markupsafe.Markup('<br>')
                     return return_str
@@ -199,7 +241,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 ansi_str = ansi_str.replace('\033[0m', markupsafe.Markup('</span>'))
                 return ansi_str
 
-            return {'format_cc_element': format_cc_element, 'ansi2html': ansi2html, 'timedelta': timedelta, 'hasattr': hasattr}
+            return {'format_cc_element': format_cc_element, 'ansi2html': ansi2html, 'timedelta': timedelta, 'hasattr': hasattr, 'format_attribute_name': format_attribute_name}
 
         @self.app.context_processor
         def inject_dict_for_all_templates() -> Dict:
