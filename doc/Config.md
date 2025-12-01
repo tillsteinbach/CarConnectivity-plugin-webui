@@ -59,6 +59,9 @@ These are the valid options for the Web UI plugin
                         "username": "testuser",
                         "password": "testpassword"
                     }],
+                    "https": true, //Enable https, default is false. if no cert/key is provided a self signed certificate is generated
+                    "ssl_certificate_file": "/home/user/certs/cert.local.cert.pem", // Path to certificate (only with "https": true)
+                    "ssl_certificate_key_file": "/home/user/certs/cert.local.key.pem", // Path to certificate key file (only with "https": true)
                     "app_config": { // Special configuration parameters
                         "SECRET_KEY": "3edf9a3f2131232e55be5b07269061f848", // SECRET_KEY can be set fixed (otherwise session cookies will invalidate more often)
                         "LOGIN_DISABLED": true, // If you prefere to not use password security at all (use this with caution and only if the webinterface is not reachable from the internet)

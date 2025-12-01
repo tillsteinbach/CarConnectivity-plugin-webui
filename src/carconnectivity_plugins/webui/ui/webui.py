@@ -24,7 +24,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import Length
 
-from werkzeug.serving import make_server
+from werkzeug.serving import make_server, _TSSLContextArg
 
 from carconnectivity.attributes import GenericAttribute, FloatAttribute
 from carconnectivity.objects import GenericObject
@@ -70,7 +70,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
     """
     # pylint: disable-next=too-many-arguments, too-many-positional-arguments, too-many-locals, too-many-statements
     def __init__(self, car_connectivity: CarConnectivity, host: str, port: int, app_config: Optional[Dict[str, str]] = None,
-                 users: Optional[Dict[str, str]] = None, locale: Optional[str] = None) -> None:
+                 users: Optional[Dict[str, str]] = None, locale: Optional[str] = None, ssl_context: Optional[_TSSLContextArg] = None) -> None:
         self.locale: Optional[str] = locale
         if app_config is None:
             app_config = {}
@@ -118,7 +118,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
             if 'carconnectivity' not in flask.current_app.extensions:
                 flask.current_app.extensions['car_connectivity'] = car_connectivity
 
-        self.server: BaseWSGIServer = make_server(host, port, self.app, threaded=True)
+        self.server: BaseWSGIServer = make_server(host, port, self.app, threaded=True, ssl_context=ssl_context)
 
         self.plugin_uis: Dict[str, BasePluginUI] = {}
         self.connector_uis: Dict[str, BaseConnectorUI] = {}

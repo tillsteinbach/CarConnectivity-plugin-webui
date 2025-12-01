@@ -6,6 +6,8 @@ import logging
 import threading
 import locale
 
+from werkzeug.serving import _TSSLContextArg
+
 from carconnectivity.errors import ConfigurationError
 from carconnectivity.util import config_remove_credentials
 from carconnectivity_plugins.base.plugin import BasePlugin
@@ -93,8 +95,21 @@ class Plugin(BasePlugin):  # pylint: disable=too-many-instance-attributes
         else:
             self.active_config['app_config'] = {}
 
+        ssl_context: Optional[_TSSLContextArg] = None
+        if 'https' in config and config['https']:
+            self.active_config['https'] = True
+            if 'ssl_certificate_file' in config and 'ssl_certificate_key_file' in config:
+                self.active_config['ssl_certificate_file'] = config['ssl_certificate_file']
+                self.active_config['ssl_certificate_key_file'] = config['ssl_certificate_key_file']
+                ssl_context = (config['ssl_certificate_file'], config['ssl_certificate_key_file'])
+            else:
+                ssl_context = 'adhoc'
+        else:
+            self.active_config['https'] = False
+
         self.webui = WebUI(car_connectivity=car_connectivity, host=self.active_config['host'], port=self.active_config['port'],
-                           app_config=self.active_config['app_config'], users=users, locale=self.active_config['locale'])
+                           app_config=self.active_config['app_config'], users=users, locale=self.active_config['locale'],
+                           ssl_context=ssl_context)
 
         LOG.info("Loading webui plugin with config %s", config_remove_credentials(config))
 
