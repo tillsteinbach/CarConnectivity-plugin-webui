@@ -30,6 +30,11 @@
 
 
       const parkingTime = new Date('{{vehicle.position.latitude.last_updated}}');
+      {% if vehicle.position.location.enabled and vehicle.position.location.display_name.enabled %}
+      const parkingAddress = '{{vehicle.position.location.display_name.value}}'
+      {% else %}
+      const parkingAddress = 'Unknown address';
+      {% endif %}
 
       var vehicleIcon = L.icon({
         iconUrl: '{{ url_for("garage.vehicle_img", vin=vehicle.vin.value, fallback='icons/pin.png')}}',
@@ -54,7 +59,7 @@
 
 
       L.marker([{{ vehicle.position.latitude.value }}, {{ vehicle.position.longitude.value }}], { icon: vehicleIcon }).addTo(map)
-        .bindTooltip('Parking position from ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString())
+        .bindTooltip('Parking position from ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString() + '<br>' + parkingAddress)
 
     </script>
     {% endif %}
