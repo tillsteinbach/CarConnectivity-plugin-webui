@@ -9,6 +9,8 @@ from base64 import b64encode
 import flask
 from flask_login import login_required
 
+from carconnectivity_plugins.webui.ui.cache import cache
+
 # pylint: disable=duplicate-code
 SUPPORT_IMAGES = False  # pylint: disable=invalid-name
 try:
@@ -51,6 +53,22 @@ def garage() -> str:
         flask.abort(500, "car_connectivity instance not connected")
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
     return flask.render_template('garage/garage.html', current_app=flask.current_app, garage=car_connectivity.garage)
+
+@blueprint.route('/json', methods=['GET'])
+@cache.cached(timeout=5)
+@login_required
+def garage_json() -> flask.Response:
+    if 'car_connectivity' not in flask.current_app.extensions or flask.current_app.extensions['car_connectivity'] is None:
+        flask.abort(500, "car_connectivity instance not connected")
+    car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
+    if car_connectivity.garage is None:
+        flask.abort(404, "Garage not found")
+    vehicle_json: str = car_connectivity.garage.as_json()
+    response = flask.Response(vehicle_json, mimetype="text/json")
+    response.cache_control.max_age = 5
+    response.cache_control.private = True
+    response.cache_control.public = False
+    return response
 
 
 @blueprint.route('/<string:vin>/', methods=['GET'])
@@ -129,3 +147,20 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
             json_map['data'] = b64encode(img_io.read()).decode()
             return flask.Response(json.dumps(json_map), mimetype='application/json')
         return flask.send_file(img_io, mimetype='image/png')
+
+@blueprint.route('/<string:vin>/json', methods=['GET'])
+@cache.cached(timeout=5)
+@login_required
+def vehicle_json(vin: str) -> flask.Response:
+    if 'car_connectivity' not in flask.current_app.extensions or flask.current_app.extensions['car_connectivity'] is None:
+        flask.abort(500, "car_connectivity instance not connected")
+    car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
+    vehicle_obj: Optional[GenericVehicle] = car_connectivity.garage.get_vehicle(vin)
+    if vehicle_obj is None:
+        flask.abort(404, f"Vehicle with VIN {vin} not found")
+    vehicle_json: str = vehicle_obj.as_json()
+    response = flask.Response(vehicle_json, mimetype="text/json")
+    response.cache_control.max_age = 5
+    response.cache_control.private = True
+    response.cache_control.public = False
+    return response
