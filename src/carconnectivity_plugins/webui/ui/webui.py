@@ -367,6 +367,20 @@ class WebUI:  # pylint: disable=too-few-public-methods
                         versions[plugin.id] = plugin.get_version()
             return flask.render_template('about.html', current_app=flask.current_app, versions=versions)
 
+        @self.app.route('/json', methods=['GET'])
+        @cache.cached(timeout=5)
+        @flask_login.login_required
+        def json_status() -> flask.Response:
+            car_connectivity: Optional[CarConnectivity] = flask.current_app.extensions['car_connectivity']
+            if car_connectivity is not None:
+                json: str = car_connectivity.as_json()
+                response = flask.Response(json, mimetype="text/json")
+                response.cache_control.max_age = 5
+                response.cache_control.private = True
+                response.cache_control.public = False
+                return response
+            flask.abort(500, "car_connectivity instance not connected")
+
     def load_blueprints(self) -> None:
         """
         Load and register blueprints for plugins and connectors.
