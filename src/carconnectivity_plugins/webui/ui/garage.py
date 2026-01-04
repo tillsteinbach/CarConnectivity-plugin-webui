@@ -54,17 +54,34 @@ def garage() -> str:
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
     return flask.render_template('garage/garage.html', current_app=flask.current_app, garage=car_connectivity.garage)
 
+
 @blueprint.route('/json', methods=['GET'])
 @cache.cached(timeout=5)
 @login_required
 def garage_json() -> flask.Response:
+    """
+    Retrieve the garage data as a JSON response.
+    This endpoint returns the current state of all vehicles in the garage as JSON.
+    The response includes cache control headers to allow private caching for 5 seconds.
+    Returns:
+        flask.Response: A Flask response object containing the garage data in JSON format
+            with appropriate cache control headers (max-age=5, private).
+    Raises:
+        500: If the car_connectivity instance is not connected or available in the
+            application extensions.
+        404: If the garage is not found or is None in the car_connectivity instance.
+    Note:
+        The response is cached privately for 5 seconds to reduce server load while
+        ensuring reasonably fresh data.
+    """
+
     if 'car_connectivity' not in flask.current_app.extensions or flask.current_app.extensions['car_connectivity'] is None:
         flask.abort(500, "car_connectivity instance not connected")
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
     if car_connectivity.garage is None:
         flask.abort(404, "Garage not found")
-    vehicle_json: str = car_connectivity.garage.as_json()
-    response = flask.Response(vehicle_json, mimetype="text/json")
+    vehicle_json_str: str = car_connectivity.garage.as_json()
+    response = flask.Response(vehicle_json_str, mimetype="text/json")
     response.cache_control.max_age = 5
     response.cache_control.private = True
     response.cache_control.public = False
@@ -148,18 +165,31 @@ def vehicle_img(vin: str, conversion: Optional[str]) -> Response:
             return flask.Response(json.dumps(json_map), mimetype='application/json')
         return flask.send_file(img_io, mimetype='image/png')
 
+
 @blueprint.route('/<string:vin>/json', methods=['GET'])
 @cache.cached(timeout=5)
 @login_required
 def vehicle_json(vin: str) -> flask.Response:
+    """
+    Generate a JSON response containing the vehicle data for a given VIN.
+    Args:
+        vin (str): The Vehicle Identification Number of the vehicle to retrieve.
+    Returns:
+        flask.Response: A Flask response object containing the vehicle data as JSON
+            with appropriate cache control headers (max_age=5, private, not public).
+    Raises:
+        500: If the car_connectivity instance is not connected or available.
+        404: If no vehicle with the specified VIN is found in the garage.
+    """
+
     if 'car_connectivity' not in flask.current_app.extensions or flask.current_app.extensions['car_connectivity'] is None:
         flask.abort(500, "car_connectivity instance not connected")
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
     vehicle_obj: Optional[GenericVehicle] = car_connectivity.garage.get_vehicle(vin)
     if vehicle_obj is None:
         flask.abort(404, f"Vehicle with VIN {vin} not found")
-    vehicle_json: str = vehicle_obj.as_json()
-    response = flask.Response(vehicle_json, mimetype="text/json")
+    vehicle_json_str: str = vehicle_obj.as_json()
+    response = flask.Response(vehicle_json_str, mimetype="text/json")
     response.cache_control.max_age = 5
     response.cache_control.private = True
     response.cache_control.public = False
