@@ -373,7 +373,17 @@ class WebUI:  # pylint: disable=too-few-public-methods
         def json_status() -> flask.Response:
             car_connectivity: Optional[CarConnectivity] = flask.current_app.extensions['car_connectivity']
             if car_connectivity is not None:
-                json: str = car_connectivity.as_json()
+                pretty: bool = flask.request.args.get('pretty', default=False, type=bool)
+                in_locale: bool = flask.request.args.get('in_locale', default=False, type=bool)
+                with_locale: Optional[str] = flask.request.args.get('with_locale', default=None, type=str)
+
+                if with_locale is not None:
+                    with_local_str: Optional[str] = with_locale
+                elif in_locale:
+                    with_local_str = car_connectivity.connectors.connectors['webui'].active_config['locale']
+                else:
+                    with_local_str = None
+                json: str = car_connectivity.as_json(pretty=pretty, in_locale=with_local_str)
                 response = flask.Response(json, mimetype="text/json")
                 response.cache_control.max_age = 5
                 response.cache_control.private = True

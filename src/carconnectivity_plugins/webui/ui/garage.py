@@ -80,7 +80,17 @@ def garage_json() -> flask.Response:
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
     if car_connectivity.garage is None:
         flask.abort(404, "Garage not found")
-    vehicle_json_str: str = car_connectivity.garage.as_json()
+    pretty: bool = flask.request.args.get('pretty', default=False, type=bool)
+    in_locale: bool = flask.request.args.get('in_locale', default=False, type=bool)
+    with_locale: Optional[str] = flask.request.args.get('with_locale', default=None, type=str)
+
+    if with_locale is not None:
+        with_local_str: Optional[str] = with_locale
+    elif in_locale:
+        with_local_str = car_connectivity.connectors.connectors['webui'].active_config['locale']
+    else:
+        with_local_str = None
+    vehicle_json_str: str = car_connectivity.garage.as_json(pretty=pretty, in_locale=with_local_str)
     response = flask.Response(vehicle_json_str, mimetype="text/json")
     response.cache_control.max_age = 5
     response.cache_control.private = True
@@ -188,7 +198,18 @@ def vehicle_json(vin: str) -> flask.Response:
     vehicle_obj: Optional[GenericVehicle] = car_connectivity.garage.get_vehicle(vin)
     if vehicle_obj is None:
         flask.abort(404, f"Vehicle with VIN {vin} not found")
-    vehicle_json_str: str = vehicle_obj.as_json()
+    pretty: bool = flask.request.args.get('pretty', default=False, type=bool)
+    in_locale: bool = flask.request.args.get('in_locale', default=False, type=bool)
+    with_locale: Optional[str] = flask.request.args.get('with_locale', default=None, type=str)
+
+    if with_locale is not None:
+        with_local_str: Optional[str] = with_locale
+    elif in_locale:
+        with_local_str = car_connectivity.connectors.connectors['webui'].active_config['locale']
+    else:
+        with_local_str = None
+
+    vehicle_json_str: str = vehicle_obj.as_json(pretty=pretty, in_locale=with_local_str)
     response = flask.Response(vehicle_json_str, mimetype="text/json")
     response.cache_control.max_age = 5
     response.cache_control.private = True
