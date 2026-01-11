@@ -409,7 +409,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
             try:
                 plugin_ui_module: ModuleType = importlib.import_module('.ui.plugin_ui', parent_name)
                 plugin_ui_class = getattr(plugin_ui_module, 'PluginUI')
-                plugin_ui_instance: BasePluginUI = plugin_ui_class(plugin)
+                plugin_ui_instance: BasePluginUI = plugin_ui_class(plugin=plugin, app=self.app)
                 self.plugin_uis[plugin.id] = plugin_ui_instance
                 if plugin_ui_instance.blueprint is not None:
                     bp_plugins.register_blueprint(plugin_ui_instance.blueprint)
@@ -417,18 +417,26 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 continue
             except AttributeError:
                 continue
+            except Exception as exc:
+                LOG.error('Cannot load UI of plugin %s. Probably the plugin is incompatible with this Version of WebUI and needs an update: %s',
+                          plugin.get_name(), exc)
+                continue
         for connector in self.car_connectivity.connectors.connectors.values():
             parent_name = '.'.join(connector.__module__.split('.')[:-1])
             try:
                 conenctor_ui_module: ModuleType = importlib.import_module('.ui.connector_ui', parent_name)
                 connector_ui_class = getattr(conenctor_ui_module, 'ConnectorUI')
-                connector_ui_instance: BaseConnectorUI = connector_ui_class(connector)
+                connector_ui_instance: BaseConnectorUI = connector_ui_class(connector=connector, app=self.app)
                 self.connector_uis[connector.id] = connector_ui_instance
                 if connector_ui_instance.blueprint is not None:
                     bp_connectors.register_blueprint(connector_ui_instance.blueprint)
             except ModuleNotFoundError:
                 continue
             except AttributeError:
+                continue
+            except Exception as exc:
+                LOG.error('Cannot load UI of connector %s. Probably the connector is incompatible with this Version of WebUI and needs an update: %s',
+                          connector.get_name(), exc)
                 continue
         with self.app.app_context():
             flask.current_app.register_blueprint(bp_plugins)
