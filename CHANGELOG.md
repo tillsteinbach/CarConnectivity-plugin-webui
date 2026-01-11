@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - No unreleased changes so far
 
+## [0.7] - 2026-01-11
+## Changed
+- Inherit locale from carconnectivity config root
+- Pass flask app to PluginUI
+
 ## [0.6] - 2026-01-04
 ### Added
 - Support for initializing attributes on startup form static entries in the configuration
@@ -75,7 +80,8 @@ Note: This plugin is required for compatibility with CarConnectivity version 0.1
 ## [0.1] - 2025-02-19
 Initial release, let's go and give this to the public to try out...
 
-[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.6...HEAD
+[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7...HEAD
+[0.7]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7
 [0.6]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.6
 [0.5.3]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.5.3
 [0.5.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.5.2
