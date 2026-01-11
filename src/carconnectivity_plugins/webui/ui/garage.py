@@ -74,7 +74,7 @@ def garage_json() -> flask.Response:
         The response is cached privately for 5 seconds to reduce server load while
         ensuring reasonably fresh data.
     """
-
+    # pylint: disable=duplicate-code
     if 'car_connectivity' not in flask.current_app.extensions or flask.current_app.extensions['car_connectivity'] is None:
         flask.abort(500, "car_connectivity instance not connected")
     car_connectivity: CarConnectivity = flask.current_app.extensions['car_connectivity']
@@ -96,6 +96,7 @@ def garage_json() -> flask.Response:
     response.cache_control.private = True
     response.cache_control.public = False
     return response
+    # pylint: enable=duplicate-code
 
 
 @blueprint.route('/<string:vin>/', methods=['GET'])

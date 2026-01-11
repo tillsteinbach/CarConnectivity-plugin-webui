@@ -367,6 +367,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                         versions[plugin.id] = plugin.get_version()
             return flask.render_template('about.html', current_app=flask.current_app, versions=versions)
 
+        # pylint: disable=duplicate-code
         @self.app.route('/json', methods=['GET'])
         @cache.cached(timeout=5)
         @flask_login.login_required
@@ -390,6 +391,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 response.cache_control.public = False
                 return response
             flask.abort(500, "car_connectivity instance not connected")
+        # pylint: enable=duplicate-code
 
     def load_blueprints(self) -> None:
         """
@@ -417,7 +419,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 continue
             except AttributeError:
                 continue
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 LOG.error('Cannot load UI of plugin %s. Probably the plugin is incompatible with this Version of WebUI and needs an update: %s',
                           plugin.get_name(), exc)
                 continue
@@ -434,7 +436,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                 continue
             except AttributeError:
                 continue
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 LOG.error('Cannot load UI of connector %s. Probably the connector is incompatible with this Version of WebUI and needs an update: %s',
                           connector.get_name(), exc)
                 continue
