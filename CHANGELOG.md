@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - No unreleased changes so far
 
+## [0.7.1] - 2026-01-23
+### Added
+- Possibility for links in bootstrap tables via jquery
+
 ## [0.7] - 2026-01-11
 ## Changed
 - Inherit locale from carconnectivity config root
@@ -80,7 +84,8 @@ Note: This plugin is required for compatibility with CarConnectivity version 0.1
 ## [0.1] - 2025-02-19
 Initial release, let's go and give this to the public to try out...
 
-[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7...HEAD
+[unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.1
 [0.7]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7
 [0.6]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.6
 [0.5.3]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.5.3
