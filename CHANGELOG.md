@@ -89,7 +89,7 @@ Note: This plugin is required for compatibility with CarConnectivity version 0.1
 Initial release, let's go and give this to the public to try out...
 
 [unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7.2...HEAD
-[0.7.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7.1...v0.7.2
+[0.7.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.2
 [0.7.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.1
 [0.7]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7
 [0.6]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.6
