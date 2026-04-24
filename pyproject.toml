@@ -14,13 +14,13 @@ authors = [
     { name = "Till Steinbach" }
 ]
 dependencies = [
-    "carconnectivity[images]>=0.11.6",
-    "Werkzeug~=3.1.3",
-    "Flask~=3.1.2",
+    "carconnectivity[images]>=0.11.9",
+    "Werkzeug~=3.1.8",
+    "Flask~=3.1.3",
     "flask-login~=0.6.3",
-    "flask-caching~=2.3.1",
+    "flask-caching~=2.4.0",
     "WTForms~=3.2.1",
-    "flask_wtf~=1.2.2",
+    "flask_wtf~=1.3.0",
     "pypng~=0.20220715.0",
     "Bootstrap-Flask~=2.5.0"
 ]
