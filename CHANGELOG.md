@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 - No unreleased changes so far
 
 ## [0.7.3] - 2026-07-05
+### Added
+- Light/dark theme mode (thanks to user @Pulpyyyy)
+
 ### Changed
 - Updated dependencies
 
@@ -93,7 +96,7 @@ Note: This plugin is required for compatibility with CarConnectivity version 0.1
 Initial release, let's go and give this to the public to try out...
 
 [unreleased]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7.3...HEAD
-[0.7.3]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/compare/v0.7.2...v0.7.3
+[0.7.3]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.3
 [0.7.2]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.2
 [0.7.1]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7.1
 [0.7]: https://github.com/tillsteinbach/CarConnectivity-plugin-webui/releases/tag/v0.7
