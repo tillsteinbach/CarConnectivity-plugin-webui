@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  {% block title %}Garage{% endblock %}
+  <span data-i18n="nav_garage">{% block title %}Garage{% endblock %}</span>
 {% endblock %}
 
 {% block content %}
@@ -19,18 +19,18 @@
             <p class="card-text">
               {{format_cc_element(vehicle.model, '', with_tooltip=false, linebreak=true)}}
               {% if vehicle.drives.enabled and vehicle.drives.drives|length > 0 %}
-                Level: {% for drive in vehicle.drives.drives.values() %}{{format_cc_element(drive.level, '')}}{% if not loop.last %}, {% endif %}{% endfor %}<br>
+                <span data-i18n="level">Level</span>: {% for drive in vehicle.drives.drives.values() %}{{format_cc_element(drive.level, '')}}{% if not loop.last %}, {% endif %}{% endfor %}<br>
               {% endif %}
               {{format_cc_element(vehicle.drives.total_range, 'Range', linebreak=true)}}
               {{format_cc_element(vehicle.odometer, 'Odometer', linebreak=true)}}
             </p>
-            <a href="{{ url_for('garage.vehicle', vin=vehicle.vin.value) }}" class="btn btn-primary">View Vehicle</a>
+            <a href="{{ url_for('garage.vehicle', vin=vehicle.vin.value) }}" class="btn btn-primary" data-i18n="view_vehicle">View Vehicle</a>
         </div>
       </div>
     {% endfor %}
     </div>
   {% else %}
-    <p>No vehicles in the garage yet. You might need to add a connector to see vehicles.</p>
+    <p data-i18n="no_vehicles">No vehicles in the garage yet. You might need to add a connector to see vehicles.</p>
   {% endif %}
 
 {% endblock %}

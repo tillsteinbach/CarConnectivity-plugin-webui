@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
+{% block title %}Plugin {{plugin.id}} Config{% endblock %}
 {% block header %}
-  <h1>{% block title %}Plugin {{plugin.id}} Config{% endblock %}</h1>
+  <h1><span data-i18n="col_plugin">Plugin</span> {{plugin.id}} <span data-i18n="word_config">Config</span></h1>
 {% endblock %}
 
 {% block content %}
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">Key</th>
-      <th scope="col">Value</th>
+      <th scope="col" data-i18n="col_key">Key</th>
+      <th scope="col" data-i18n="col_value">Value</th>
     </tr>
   </thead>
   <tbody>

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
+{% block title %}Plugins Status{% endblock %}
 {% block header %}
-  <h1>{% block title %}Plugins Status{% endblock %}</h1>
+  <h1><span data-i18n="nav_plugins">Plugins</span> <span data-i18n="nav_status">Status</span></h1>
 {% endblock %}
 
 {% block content %}
@@ -9,11 +10,11 @@
 <table class="table">
   <thead>
       <tr>
-          <th>Plugin</th>
-          <th>Plugin Status</th>
-          <th>Log Level</th>
-          <th>Version</th>
-          <th>Optional Features</th>
+          <th data-i18n="col_plugin">Plugin</th>
+          <th data-i18n="col_plugin_status">Plugin Status</th>
+          <th data-i18n="col_log_level">Log Level</th>
+          <th data-i18n="col_version">Version</th>
+          <th data-i18n="col_optional_features">Optional Features</th>
       </tr>
   </thead>
   <tbody>
@@ -24,13 +25,13 @@
       <tr class="table-danger">
       {% endif %}
           <td>{{plugin.id}}</td>
-          <td>{{ "healthy" if plugin.is_healthy() else "unhealthy"}}</td>
+          <td><span data-i18n="{{ 'healthy' if plugin.is_healthy() else 'unhealthy' }}">{{ "healthy" if plugin.is_healthy() else "unhealthy"}}</span></td>
           <td>{{plugin.log_level}}</td>
           <td>{{plugin.get_version()}}</td>
           <td>
             <ul>
               {% for feature_name, features_status in plugin.get_features().items() %}
-              <li>{{feature_name}}: {{ "enabled" if features_status[0] else "disabled -  "+features_status[1]}}</li>
+              <li>{{feature_name}}: {% if features_status[0] %}<span data-i18n="enabled">enabled</span>{% else %}<span data-i18n="disabled">disabled</span> -  {{features_status[1]}}{% endif %}</li>
               {% endfor %}
             </ul>
           </td>
@@ -39,6 +40,6 @@
   </tbody>
 </table>
 {% else %}
-<p>No plugins found</p>
+<p data-i18n="no_plugins">No plugins found</p>
 {% endif %}
 {% endblock %}

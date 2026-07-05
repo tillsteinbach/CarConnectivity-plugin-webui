@@ -33,7 +33,7 @@
       {% if vehicle.position.location.enabled and vehicle.position.location.display_name.enabled %}
       const parkingAddress = '{{vehicle.position.location.display_name.value}}'
       {% else %}
-      const parkingAddress = 'Unknown address';
+      const parkingAddress = t('unknown_address');
       {% endif %}
 
       var vehicleIcon = L.icon({
@@ -59,68 +59,68 @@
 
 
       L.marker([{{ vehicle.position.latitude.value }}, {{ vehicle.position.longitude.value }}], { icon: vehicleIcon }).addTo(map)
-        .bindTooltip('Parking position from ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString() + '<br>' + parkingAddress)
+        .bindTooltip(t('parking_position_from') + ' ' + parkingTime.toLocaleDateString() + ' ' + parkingTime.toLocaleTimeString() + '<br>' + parkingAddress)
 
     </script>
     {% endif %}
     </div>
     <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
       <li class="nav-item">
-        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#vehicle">Vehicle</a>
+        <a class="nav-link active" aria-current="true" data-bs-toggle="tab" href="#vehicle" data-i18n="tab_vehicle">Vehicle</a>
       </li>
       {% if vehicle.specification.enabled %}
       <li class="nav-item">
-        <a class="nav-link" aria-current="true" data-bs-toggle="tab" href="#specification">Specification</a>
+        <a class="nav-link" aria-current="true" data-bs-toggle="tab" href="#specification" data-i18n="tab_specification">Specification</a>
       </li>
       {% endif %}
       {% if vehicle.software.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#software">Software</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#software" data-i18n="tab_software">Software</a>
       </li>
       {% endif %}
       {% if vehicle.drives.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#drives">Drives</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#drives" data-i18n="tab_drives">Drives</a>
       </li>
       {% endif %}
       {% if vehicle.doors.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#doors">Doors</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#doors" data-i18n="tab_doors">Doors</a>
       </li>
       {% endif %}
       {% if vehicle.windows.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#windows">Windows</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#windows" data-i18n="tab_windows">Windows</a>
       </li>
       {% endif %}
       {% if vehicle.lights.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#lights">Lights</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#lights" data-i18n="tab_lights">Lights</a>
       </li>
       {% endif %}
       {% if hasattr(vehicle, 'charging') and vehicle.charging.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#charging">Charging</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#charging" data-i18n="tab_charging">Charging</a>
       </li>
       {% endif %}
       {% if vehicle.climatization.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#climatization">Climatization</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#climatization" data-i18n="tab_climatization">Climatization</a>
       </li>
       {% endif %}
       {% if vehicle.window_heatings.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#window_heating">Window Heating</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#window_heating" data-i18n="tab_window_heating">Window Heating</a>
       </li>
       {% endif %}
       {% if vehicle.maintenance.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#maintenance">Maintenance</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#maintenance" data-i18n="tab_maintenance">Maintenance</a>
       </li>
       {% endif %}
       {% if vehicle.position.enabled %}
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#position">Position</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#position" data-i18n="tab_position">Position</a>
       </li>
       {% endif %}
     </ul>
@@ -132,8 +132,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,8 +154,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,8 +176,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,8 +198,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -220,8 +220,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -242,8 +242,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,8 +264,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -287,8 +287,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -310,8 +310,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -332,8 +332,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -354,8 +354,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -376,8 +376,8 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Value</th>
+                  <th scope="col" data-i18n="col_attribute">Attribute</th>
+                  <th scope="col" data-i18n="col_value">Value</th>
                 </tr>
               </thead>
               <tbody>

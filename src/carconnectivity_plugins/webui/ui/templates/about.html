@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}About{% endblock %}</h1>
+  <h1 data-i18n="about">{% block title %}About{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-<p>CarConnectivity is developed under the <a href="https://github.com/tillsteinbach/CarConnectivity/blob/main/LICENSE">MIT</a> open-source license.</p>
+<p><span data-i18n="about_license_pre">CarConnectivity is developed under the</span> <a href="https://github.com/tillsteinbach/CarConnectivity/blob/main/LICENSE">MIT</a> <span data-i18n="about_license_post">open-source license.</span></p>
 
-<h2>Donations</h1>
-<p>CarConnectivity is free for everyone. If you think CarConnectivity is usefull please consider donating through</p>
+<h2 data-i18n="donations">Donations</h2>
+<p data-i18n="donations_intro">CarConnectivity is free for everyone. If you think CarConnectivity is usefull please consider donating through</p>
 <ul></ul>
 <li><a href="https://www.paypal.com/donate?hosted_button_id=2BVFF5GJ9SXAJ">PayPal</a></li>
 <li><a href="https://github.com/sponsors/tillsteinbach">GitHub Sponsors</a></li>
 </ul>
-<p>A big thanks to all sponsors for their support. With your contribution you make free software possible!</p>
+<p data-i18n="donations_thanks">A big thanks to all sponsors for their support. With your contribution you make free software possible!</p>
 
-<h2>Versions</h1>
+<h2 data-i18n="versions">Versions</h2>
 <ul>
   {% for tool, version in versions.items() %}
   <li><strong>{{tool}}:</strong> {{version}}</li>

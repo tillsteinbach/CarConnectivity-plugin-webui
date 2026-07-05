@@ -209,22 +209,24 @@ class WebUI:  # pylint: disable=too-few-public-methods
             connectors_sublinks = []
             # Build the Navigation Bar
             nav = [
-                {"text": "Garage", "url": flask.url_for('garage.garage')},
+                {"text": "Garage", "i18n": "nav_garage", "url": flask.url_for('garage.garage')},
                 {
                     "text": "Connectors",
+                    "i18n": "nav_connectors",
                     "sublinks": connectors_sublinks,
                     "url": flask.url_for('connectors.status')
                 },
                 {
                     "text": "Plugins",
+                    "i18n": "nav_plugins",
                     "sublinks": plugins_sublinks,
                     "url": flask.url_for('plugins.status')
                 },
-                {"text": "Log", "url": flask.url_for('log')},
+                {"text": "Log", "i18n": "nav_log", "url": flask.url_for('log')},
             ]
             if 'carconnectivity_connector_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_connector_uis'] is not None:
                 connector_uis: Dict = flask.current_app.extensions['carconnectivity_connector_uis']
-                connectors_sublinks.append({"text": "Status", "url": flask.url_for('connectors.status')})
+                connectors_sublinks.append({"text": "Status", "i18n": "nav_status", "url": flask.url_for('connectors.status')})
                 connectors_sublinks.append({"divider": True})
                 for connector_ui in connector_uis.values():
                     connector_nav = [
@@ -237,7 +239,7 @@ class WebUI:  # pylint: disable=too-few-public-methods
                     connectors_sublinks.extend(connector_nav)
             if 'carconnectivity_plugin_uis' in flask.current_app.extensions and flask.current_app.extensions['carconnectivity_plugin_uis'] is not None:
                 plugin_uis: Dict = flask.current_app.extensions['carconnectivity_plugin_uis']
-                plugins_sublinks.append({"text": "Status", "url": flask.url_for('plugins.status')})
+                plugins_sublinks.append({"text": "Status", "i18n": "nav_status", "url": flask.url_for('plugins.status')})
                 plugins_sublinks.append({"divider": True})
                 for plugin_ui in plugin_uis.values():
                     plugin_nav = [

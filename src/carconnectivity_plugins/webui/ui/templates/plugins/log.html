@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
+{% block title %}Plugin {{plugin.id}} Log{% endblock %}
 {% block header %}
-  <h1>{% block title %}Plugin {{plugin.id}} Log{% endblock %}</h1>
+  <h1><span data-i18n="col_plugin">Plugin</span> {{plugin.id}} <span data-i18n="word_log">Log</span></h1>
 {% endblock %}
 
 {% block content %}
-Last {{ plugin.log_storage.storage|length }} log entries, latest first:
+<span data-i18n="log_last">Last</span> {{ plugin.log_storage.storage|length }} <span data-i18n="log_entries">log entries, latest first:</span>
 <div class="form-control form-control-sm bg-dark text-light" style="overflow-y:scroll; height: 800px;">
 {% for log_record in plugin.log_storage.storage|reverse %}
 {{ ansi2html(formatter.format(log_record)) }}<br>

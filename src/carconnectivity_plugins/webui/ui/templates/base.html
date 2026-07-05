@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script>
     $(function () {
@@ -27,6 +28,9 @@
     })
 
     document.addEventListener("DOMContentLoaded", function(){
+      if (typeof I18N_LANG !== "undefined") { document.documentElement.lang = I18N_LANG; }
+      applyI18n();
+
       Array.from(document.getElementsByClassName("js-convert-time-title")).forEach((element) => {
         element.title = element.title.replace(/\$\$\$([\s0-9:\+\.\-Z]+)\$\$\$/g, (match, p1) => new Date(p1).toString());
       });
@@ -60,11 +64,11 @@
           <hr class="dropdown-divider">
           {% elif not item.sublinks %}
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{item.url}}">{{item.text}}</a>
+            <a class="nav-link active" aria-current="page" href="{{item.url}}"{% if item.i18n %} data-i18n="{{item.i18n}}"{% endif %}>{{item.text}}</a>
           </li>
           {% else %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"{% if item.i18n %} data-i18n="{{item.i18n}}"{% endif %}>
               {{item.text}}
             </a>
             <ul class="dropdown-menu">
@@ -72,10 +76,10 @@
               {% if sublink.divider %}
               <hr class="dropdown-divider">
               {% elif not sublink.sublinks %}
-              <li><a class="dropdown-item" href="{{sublink.url}}">{{sublink.text}}</a></li>
+              <li><a class="dropdown-item" href="{{sublink.url}}"{% if sublink.i18n %} data-i18n="{{sublink.i18n}}"{% endif %}>{{sublink.text}}</a></li>
               {% else %}
               <li class="nav-item dropend">
-                <a class="nav-link dropdown-toggle text-body" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle text-body" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"{% if sublink.i18n %} data-i18n="{{sublink.i18n}}"{% endif %}>
                   {{sublink.text}}
                 </a>
                 <ul class="dropdown-menu">
@@ -103,9 +107,9 @@
             </ul>
           </div>
           {% if current_user.is_authenticated %}
-          <a href="{{ url_for('logout') }}" class="nav-item nav-link">Logout {{ current_user.get_id() }}</a>
+          <a href="{{ url_for('logout') }}" class="nav-item nav-link"><span data-i18n="logout">Logout</span> {{ current_user.get_id() }}</a>
           {% else %}
-          <a href="{{ url_for('login') }}" class="nav-item nav-link">Login</a>
+          <a href="{{ url_for('login') }}" class="nav-item nav-link" data-i18n="login">Login</a>
           {% endif %}
         </div>
       </div>
@@ -135,7 +139,7 @@
             <p>CarConnectivity</p>
           </div>
           <div class="col-md-6 text-md-end">
-            <a href="{{ url_for('about') }}" class="text-body">About</a>
+            <a href="{{ url_for('about') }}" class="text-body" data-i18n="about">About</a>
           </div>
         </div>
       </footer>

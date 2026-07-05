@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
+{% block title %}Connectors Status{% endblock %}
 {% block header %}
-  <h1>{% block title %}Connectors Status{% endblock %}</h1>
+  <h1><span data-i18n="nav_connectors">Connectors</span> <span data-i18n="nav_status">Status</span></h1>
 {% endblock %}
 
 {% block content %}
@@ -9,12 +10,12 @@
 <table class="table">
   <thead>
       <tr>
-          <th>Connector</th>
-          <th>Connector Status</th>
-          <th>Log Level</th>
-          <th>Version</th>
-          <th>Optional Features</th>
-          <th>Last Update</th>
+          <th data-i18n="col_connector">Connector</th>
+          <th data-i18n="col_connector_status">Connector Status</th>
+          <th data-i18n="col_log_level">Log Level</th>
+          <th data-i18n="col_version">Version</th>
+          <th data-i18n="col_optional_features">Optional Features</th>
+          <th data-i18n="col_last_update">Last Update</th>
       </tr>
   </thead>
   <tbody>
@@ -25,7 +26,7 @@
       <tr class="table-danger">
       {% endif %}
           <td>{{connector.id}}</td>
-          <td>{{ "healthy" if connector.is_healthy() else "unhealthy"}}</td>
+          <td><span data-i18n="{{ 'healthy' if connector.is_healthy() else 'unhealthy' }}">{{ "healthy" if connector.is_healthy() else "unhealthy"}}</span></td>
           <td>{{connector.log_level}}</td>
           <td>{{connector.get_version()}}</td>
           <td>
@@ -41,6 +42,6 @@
   </tbody>
 </table>
 {% else %}
-<p>No connectors found</p>
+<p data-i18n="no_connectors">No connectors found</p>
 {% endif %}
 {% endblock %}
