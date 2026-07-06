@@ -206,7 +206,7 @@
                 {% for child in vehicle.drives.children %}
                 {% if child.enabled and child.id not in ['commands'] %}
                 <tr>
-                  <td>{{child.id}}</td>
+                  <td>{{format_attribute_name(child.id)}}</td>
                   <td>{{format_cc_element(child, '', linebreak=true)}}</td>
                 </tr>
                 {% endif %}
